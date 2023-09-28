@@ -1,0 +1,118 @@
+data=['ÿØÿà\x00\x10JFIF\x00\x01\x01\x00\x00\x01\x00\x01\x00\x00ÿÛ\x00C\x00\x02\x01\x01\x01\x01\x01\x02\x01\x01\x01\x02\x02\x02\x02\x02\x04\x03\x02\x02\x02\x02\x05\x04\x04\x03\x04\x06\x05\x06\x06\x06\x05\x06\x06\x06\x07\t\x08\x06\x07\t\x07\x06\x06\x08\x0b\x08\t\n\n\n\n\n\x06\x08\x0b\x0c\x0b\n\x0c\t\n\n\nÿÛ\x00C\x01\x02\x02\x02\x02\x02\x02\x05\x03\x03\x05\n\x07\x06\x07\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nÿÀ\x00\x11\x08\x00l\x00I\x03\x01"\x00\x02\x11\x01\x03\x11\x01ÿÄ\x00\x1f\x00\x00\x01\x05\x01\x01\x01\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x01\x02\x03\x04\x05\x06\x07\x08\t\n\x0bÿÄ\x00µ\x10\x00\x02\x01\x03\x03\x02\x04\x03\x05\x05\x04\x04\x00\x00\x01}\x01\x02\x03\x00\x04\x11\x05\x12!1A\x06\x13Qa\x07"q\x142\x81\x91¡\x08#B±Á\x15RÑð$3br\x82\t\n\x16\x17\x18\x19\x1a%&\'()*456789:CDEFGHIJSTUVWXYZcdefghijstuvwxyz\x83\x84\x85\x86\x87\x88\x89\x8a\x92\x93\x94\x95\x96\x97\x98\x99\x9a¢£¤¥¦§¨©ª²³´µ¶·¸¹ºÂÃÄÅÆÇÈÉÊÒÓÔÕÖ×ØÙÚáâãäåæçèéêñòóôõö÷øùúÿÄ\x00\x1f\x01\x00\x03\x01\x01\x01\x01\x01\x01\x01\x01\x01\x00\x00\x00\x00\x00\x00\x01\x02\x03\x04\x05\x06\x07\x08\t\n\x0bÿÄ\x00µ\x11\x00\x02\x01\x02\x04\x04\x03\x04\x07\x05\x04\x04\x00\x01\x02w\x00\x01\x02\x03\x11\x04\x05!1\x06\x12AQ\x07aq\x13"2\x81\x08\x14B\x91¡±Á\t#3Rð\x15brÑ\n\x16$4á%ñ\x17\x18\x19\x1a&\'()*56789:CDEFGHIJSTUVWXYZcdefghijstuvwxyz\x82\x83\x84\x85\x86\x87\x88\x89\x8a\x92\x93\x94\x95\x96\x97\x98\x99\x9a¢£¤¥¦§¨©ª²³´µ¶·¸¹ºÂÃÄÅÆÇÈÉÊÒÓÔÕÖ×ØÙÚâãäåæçèéêòóôõö÷øùúÿÚ\x00\x0c\x03\x01\x00\x02\x11\x03\x11\x00?\x00þ\x7fëCÂ~\x13ñW\x8f|U¦x\x17À¾\x19Ô5\xadoZÔ!°Ñ´m&Éîn¯î¦q\x1cVðÅ\x18/,®ì¨¨\xa0³3\x00\x01&¿ªßø!¿ü\x12¯þ\x08Ûñ+þ\tÇð³ö\x97ðoìaðÿ\x00Æº¿\x8f~\x1fé?ð\x9bk~:Ð&×<ÝvÆ7µÔü\x88u\x8f5lñ¨-â7ÙR(¥òÐ\x8dñ¬$~\x97øOÂ~\x15ð\x17\x85tÏ\x02ø\x17Ã:~\x8b¢hº|6\x1a6\x8d¤Ù%µ\xad\x85¬(#\x8aÞ\x18£\x01"\x89\x11U\x15\x14\x05UP\x00\x00P\x07ñ\x85ðSþ\x08[ÿ\x00\x05\x81øýâ«\x8f\x07x\x17þ\tÛñBÂîÛO{Ù&ñ¯\x87_ÃV¦5xÐª]jæÚ\t%Ì\x8aD*æB¡Ø)Tr¿X|-ÿ\x00\x836ÿ\x00à®\x1f\x10<\tcâï\x16x\x93àÿ\x00\x81µ\x0b¿7í\x1e\x16ñO\x8c®æ¿²Ù+¢ù¯¦ØÝÚ\x9dê¢Eòç|,\x8a\x1bk\x86Eþ§h\xa0\x0fÂ\x1f\x85¿ðc§ÂÍ#Çv:\x87Æ¿ø(\x97\x88<Aá\x88üßí=#Âß\x0e Ñïî3\x13\x88ü«Éï¯c\x87l¦6mÖònUd\x1b\x0b\x07_§þ\x05ÿ\x00Á¡¿ðFß\x84\x9fÚ\x9fð\x9fø+â\x07Å\x0fí\x0f#ì\x9fð\x9dxîk\x7fìÏ/ÌÝä\x7fc%\x86ï3zîó¼ÜyI³f_\x7féý\x14\x01ò\x87\x8b?à\x87?ðJ\x1f\x11ü\x02Ôÿ\x00gÍ\x1fö\x11ø_\xa0Z_ø>o\x0fZø£Ið\x1e\x98úþ\x9d\x1bÚ\x9be¼\x87Qº·\x9av¾\x8c\x11"ÝJÒHeQ#\x97l\x93üYW÷ù_Ä\x17ü\x15oá?ü(ïø)¯Çÿ\x00\x85¶ß\r?á\x0fÓô¿\x8c\x1e!þÁðâhßÙðÚiRj\x13Maö{p\x88±Û=¤\x90I\x0eÅ\x08Ð¼l\x99B¦\x80<\x02\x8a(\xa0\x0fê÷þ\r\røéÿ\x00\x0boþ\x08Û¢ø\x03þ\x11oìÿ\x00øUÿ\x00\x105ï\x0c}¯íÞoö\x9f\x9b2k?hÛ±|\x9c\x7fkù\x1b2ùû>ýÃÌØ\x9f§õø\x03ÿ\x00\x06:|Xÿ\x00\x93\x89ø\x17«üKÿ\x00¡o]ð÷\x83®u\x9fû\x08[ê\x17öö\x8cÿ\x00ö\x0c\x8ay\x91\x7fçÑ]¿Õ\nýþ\xa0\x02\x8a(\xa0\x02\x8a(\xa0\x02¿\x94/ø;Ëà_ü*Oø,\x96µãÿ\x00øJ\x7f´?áh|?Ð|OöO°ù_Ù\x9eT/£}\x9fvöó³ý\x91çïÂcí\x1b6\x9f/{ÿ\x00Wµüðÿ\x00Áñ\x7f\x0b|\t¤|Sý\x9d¾5éú\x17\x97â\x7f\x10x\x7fÄ\x9a&¯©ýªSö\x8b\r>}>{8|²Æ4òåÔï\x9br¨fóðÅ\x82 P\x0fÂ\x1a(¢\x80?Sÿ\x00àÏO\x8d~\x15øWÿ\x00\x05\x81\x8fÀ¾!Óõ\t®þ%|/Öü7¡Ie\x124p]Döº»<å\x9dJÅö}*á\x01@íæ<ChRÎ\x9fÕm\x7f\x14_ðE/\x8a^;ø?ÿ\x00\x05pý\x9c¼Yðë]þÎÔ.þ0hz%ÅÇÙb\x9b}\x86§v\x9amô;eVQæZ]ÜE¸\rÉænB®ªÃû]\xa0\x02\x8a(\xa0\x02\x8a(\xa0\x02¿,?àð¿\x82\x9e*ø©ÿ\x00\x04~\x93Ç^\x1eÔ4øm>\x1aüPÑ<I®Ç{+¬\x93ÚÊ\x97ZB¤\x01Q\x83Kö\x8dVÝÈr\x8bå¤§q`¨ÿ\x00©õò\x87ü\x17Kà§\x85~?\x7fÁ\x1f¿h\x9f\x02øÇPÔ-\xad,>\x17ê>$\x86M2TI\rÖ\x8c\x83WµB]\x1cyMqc\x12H\x00\x0ccg\nÈÄ:\x80\x7f\x16TQE\x00\x15ýî|\'ø¥àO\x8e?\x0b<5ñ¯án»ý©á\x8f\x18x~Ë[ðæ§öY`û]\x85Ü\t=¼Þ\\Ê\x92G¾)\x11¶º«.pÀ\x10E\x7f\x04uý\x96ÿ\x00Á¼_\x1aüUñûþ\x08·û?øëÆ:~\x9fmwaàù|7\x0czdN\x91\x9b]\x1aúçHµr\x1dÜù\xadoc\x13ÈA\ndg*¨¤"\x80}\x9fE\x14P\x01E\x14P\x01Yþ,ð\x9f\x85|{á]OÀ¾:ðÎ\x9f\xadh\x9aÖ\x9f5\x86³£jÖIsk\x7fk2\x18å·\x9a)\x01IbtfFF\x05YX\x82\x085¡E\x00\x7f\x04\x7f\x16~\x16øïàwÅ?\x13|\x14ø¥¡\x7feø\x9fÁþ ½Ñ<G¦}ª)þÉ\x7fi;Áq\x0f\x99\x0b<rl\x967]ÈÌ\xad\x8c© \x83\\ý}\x7fÿ\x00\x05øø\x17ÿ\x00\x0cïÿ\x00\x05\x92ý¡<\x01ÿ\x00\tOöÇö\x87Ä\t¼Oö¿°ý\x9fËþÛ\x86-gìûw¾|\x9f·ù\x1bò<Ï+~ÔÝ±~@\xa0\x02¿§ïø2çâÇü%ÿ\x00ðL¯\x1aü-Õ~%ÿ\x00jj\x1e\x0føÁ}ö/\x0e\\k>|Ú&\x95w§ØM\x0eËrå\xad\xad¦»]JDÂªI0ºa\x97\x12\x1aþ`köûþ\x0c\x86øéÿ\x00\x08ÿ\x00íOñÃöhÿ\x00\x84[Îÿ\x00\x84·áþ\x9dâ\x7fí¿·mû\'öEñµû?\x93°ù\x9eoöÞýû×gÙ±µüÌ\xa0\x07ô}E\x14P\x01E\x14P\x01E\x14P\x07òåÿ\x00\x07\x96ü\x01Ó¾\x19ÿ\x00ÁQ´\x1f\x8cÞ\x1cø{¨iö\x9f\x12¾\x17é÷ºÏ\x88$K\x86µÕõ\x9b;\x8b\x8b\x19V9$&1,60éJðÅ´*¼22\x86\x9b{þHWô]ÿ\x00\x07Á|\x14ñV»ð\x0bà\x17í\x19g¨ië¢xWÆ\x1a×\x86õ\x0bY%qu%Ö«kmunñ¨B\x86%M\x1aè9gV\r$!UÃ1OçF\x80\ný\x1fÿ\x00\x83Oþ)xïáÿ\x00ü\x16×áÇ\x84ü#®ý\x93OñÏ\x87üE¢x¦ßì±IöÛ\x08ô\x9b\x9dI!ÜêZ<]éörî\x8c«\x1f\'i;\x1dÕ¿8+Ô?b/\x8d~\x15ý\x9aÿ\x00m\x0f\x84?´g\x8e´ýBïDð\x07Å\r\x03Ä\x9aÍ®\x93\x12Iu5\xad\x8e£\x05Ô©\nÈè\x8d)H\x98(gE,@,£\x90\x01ýÖQE\x14\x00QE\x14\x00QE\x14\x01ù¡ÿ\x00\x07lü\x14ð¯ÅOø"ß\x8c<uâ\x1dCP\x86ïá¯\x8c<?âM\n;)Qc\x9eê[äÒ\x19\'\x0c\x8cZ/³ê·\x0e\x02\x14o1";\x8a\x86GþL«û\x9cÿ\x00\x82\x84ü-ñßÇ\x1fØ\x17ã\x87ÁO\x85º\x17ö§\x89üað\x7fÄÚ\'\x874ÏµE\x07Úïîô«\x98-áó&d\x8e=òÈ\x8b¹ÙUs\x96 \x02køc\xa0\x02\x8a(\xa0\x0fî³ö"ø×â¯ÚSö/øCûFxëOÓí5¿\x1fü/Ð<I¬Úé1<v°Ý_iÐ]J\x90¬\x8eî±\x07\x95\x82\x86w`\xa0\x02Ìy>¡_É\x97ì_ÿ\x00\x07Vÿ\x00ÁI?b\x1fÙ\x7fÂ\x1f²\x97\x81|\x0fð¿ÅZ\'\x82t÷°Ñµ\x9f\x1ei\x9aÅö¦m|é$\x8aÝå\x8fS\x89<¨\x11ÖÞ\x14TU\x8e\x08b\x8c\x0c%xÿ\x00Æ¿ø8wþ\x0bGñûÂ¶þ\x0eñ×ü\x14\x03Æ\x16\x16\x96Ú\x82^Ç7\x82\xadl|5tdT\x91\x02½Ö\x91om<\x91bF&\x16s\x19`\x8cT²!P\x0fì¶¼\x03âÏü\x15oþ\t\x95ð;þ\x12ko\x8a_·÷Áý/Pð\x7fÛWÄz\x0fü,->}VÒkMââÛì\x10Ê÷R\\£Féöd\x8d¦g\x1b\x15\x0b\x90µüY|ký¡~>þÒ\x9e*·ñ×í\x19ñÇÆ\x1e?Öí4ô°µÖ|kâk\xadVê\x1bUy$[t\x96êGu\x88<²¸@v\x86\x91Î2Ç<}\x00\x7fW¿\x1d?àï/ø#oÂOì¿ø@<kñ\x03â\x87ö\x87\x9fö¿øA|\t5¿ög\x97åíóÿ\x00¶^Ãw\x99½¶ù>n<§ß³)¿æ\x0f\x8a_ð|_ÂÍ#ÇwÚ\x7fÁOø\'o\x88<Aá\x88ü¯ìÍ_Å?\x11àÑïî3\x12\x19<Û8,oc\x87l¦E]·\x12nUW;\x0b\x14_ç\x86\x8a\x00ýOø×ÿ\x00\x07\x85ÿ\x00Á`~*xVßÃÞ\x05¹ø_ðÖî\x1dA.$×|\x15à\x87\x9eêxÂH¦Ù×W¸¾\x80DÅÕÉX\x96MÑ&\x1c)u\x7fË\n(\xa0\x0fÿÙ', {
+	'image_height': 55.0,
+	'image_width': 45.0,
+	'legend': 0,
+	'postprocess_name': 'PPE',
+	'usecase_name': 'usecase_001',
+	'usecase_description': 'PPE',
+	'usecase_template_id': 1,
+	'incidents': {
+		'2': {
+			'incident_name': 'NoVest',
+			'measurement_unit': None,
+			'incident_type_id': 1,
+			'incident_type_name': 'Base',
+			'class_id': 2,
+			'class_name': 'novest'
+		},
+		'3': {
+			'incident_name': 'incident_00',
+			'measurement_unit': 'km',
+			'incident_type_id': 1,
+			'incident_type_name': 'Base',
+			'class_id': 2,
+			'class_name': 'novest'
+		}
+	},
+	'steps': {
+		'1': {
+			'step_name': 'Add Model',
+			'step_type': 'model',
+			'computation_id': None,
+			'model_id': 2,
+			'model_url': 'http://172.16.0.178:6503/detect',
+			'model_type': None,
+			'model_framework': None,
+			'classes': {
+				'1': {
+					'class_id': 1,
+					'class_name': 'person',
+					'class_conf': 0.1,
+					'uploaded_class_name': 'human',
+					'bound_color': '#000080',
+					'bound_thickness': 1,
+					'text_thickness': 1,
+					'text_color': '#FFFFFB'
+				},
+				'2': {
+					'class_id': 2,
+					'class_name': 'novest',
+					'class_conf': 0.1,
+					'uploaded_class_name': 'novest',
+					'bound_color': '#000080',
+					'bound_thickness': 5,
+					'text_thickness': 2,
+					'text_color': '#FFFFFF'
+				}
+			}
+		}
+	}
+}, '1_1', {
+	'document_id': 'd0aee931-8617-40bf-84fb-3ada52ae3b82',
+	'image_meta': {
+		'name': 'subsite_001_1_2023_09_18_13_25_53_692851.jpg',
+		'height': 56,
+		'width': 100,
+		'storage': {}
+	},
+	'usecase': {
+		'id': '1',
+		'name': 'usecase_001'
+	},
+	'time': {
+		'timestamp': 1695043553.7439928,
+		'zone': '',
+		'incident_time': '2023-09-18 13:25:53.743997',
+		'UTC_time': '2023-09-18 13:25:53.744018'
+	},
+	'hierarchy': {
+		'camera_id': 1,
+		'camera_name': 'Camera_fire',
+		'subsite_id': 1,
+		'subsite_name': 'subsite_001',
+		'location_id': 1,
+		'location_name': 'Delhi',
+		'customer_id': 1,
+		'customer_name': 'DTL',
+		'zone_id': 1,
+		'zone': 'Delhi',
+		'zone_name': 'Delhi',
+		'city': 'New delhi'
+	},
+	'pipeline_inform': {
+		'preprocess_id': 1,
+		'schedule_id': '',
+		'camera_group_id': 1
+	}
+}]
+import redis
+import cv2
+from src.main import PostProcessingApp
+from sourcelogs.logger import create_rotating_log
+from src.parser import Config
+from kafka import KafkaProducer
+import json
+def connect_producer(kafkahost):
+	producer =  KafkaProducer(bootstrap_servers=kafkahost,value_serializer=lambda x: json.dumps(x).encode("utf-8"))
+	return producer
+pool = redis.ConnectionPool(host='localhost', port=6379, db=0)
+r_con = redis.Redis(connection_pool=pool)
+logger=create_rotating_log("logs/log.log")
+img=cv2.imread("ppe_test.jpg")
+img_str=cv2.imencode(".jpg", img)[1].tobytes().decode("ISO-8859-1")
+conf = Config.yamlconfig("config/config.yaml")
+kafkahost=conf[0]["kafka"]
+producer=connect_producer(kafkahost)
+postprocess=PostProcessingApp(r_con,logger)
+postprocess.initialize(img_str,data[1],data[2],data[3],producer)
+postprocess.process()

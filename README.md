@@ -1,20 +1,48 @@
-# Introduction 
-TODO: Give a short introduction of your project. Let this section explain the objectives or the motivation behind this project. 
+# PostProcessing
 
-# Getting Started
-TODO: Guide users through getting your code up and running on their own system. In this section you can talk about:
-1.	Installation process
-2.	Software dependencies
-3.	Latest releases
-4.	API references
+[![Release](https://img.shields.io/github/v/release/./PostProcessing)](https://img.shields.io/github/v/release/./PostProcessing)
+[![Build status](https://img.shields.io/github/actions/workflow/status/./PostProcessing/main.yml?branch=main)](https://github.com/./PostProcessing/actions/workflows/main.yml?query=branch%3Amain)
+[![codecov](https://codecov.io/gh/./PostProcessing/branch/main/graph/badge.svg)](https://codecov.io/gh/./PostProcessing)
+[![Commit activity](https://img.shields.io/github/commit-activity/m/./PostProcessing)](https://img.shields.io/github/commit-activity/m/./PostProcessing)
+[![License](https://img.shields.io/github/license/./PostProcessing)](https://img.shields.io/github/license/./PostProcessing)
 
-# Build and Test
-TODO: Describe and show how to build your code and run the tests. 
+This is a template repository for Python projects that use Poetry for their dependency management.
 
-# Contribute
-TODO: Explain how other users and developers can contribute to make your code better. 
+- **Github repository**: <https://github.com/./PostProcessing/>
+- **Documentation** <https://..github.io/PostProcessing/>
 
-If you want to learn more about creating good readme files then refer the following [guidelines](https://docs.microsoft.com/en-us/azure/devops/repos/git/create-a-readme?view=azure-devops). You can also seek inspiration from the below readme files:
-- [ASP.NET Core](https://github.com/aspnet/Home)
-- [Visual Studio Code](https://github.com/Microsoft/vscode)
-- [Chakra Core](https://github.com/Microsoft/ChakraCore)
+## Getting started with your project
+
+First, create a repository on GitHub with the same name as this project, and then run the following commands:
+
+``` bash
+git init -b main
+git add .
+git commit -m "init commit"
+git remote add origin git@github.com:./PostProcessing.git
+git push -u origin main
+```
+
+Finally, install the environment and the pre-commit hooks with 
+
+```bash
+make install
+```
+
+You are now ready to start development on your project! The CI/CD
+pipeline will be triggered when you open a pull request, merge to main,
+or when you create a new release.
+
+To finalize the set-up for publishing to PyPi or Artifactory, see
+[here](https://fpgmaas.github.io/cookiecutter-poetry/features/publishing/#set-up-for-pypi).
+For activating the automatic documentation with MkDocs, see
+[here](https://fpgmaas.github.io/cookiecutter-poetry/features/mkdocs/#enabling-the-documentation-on-github).
+To enable the code coverage reports, see [here](https://fpgmaas.github.io/cookiecutter-poetry/features/codecov/).
+
+## Releasing a new version
+
+
+
+---
+
+Repository initiated with [fpgmaas/cookiecutter-poetry](https://github.com/fpgmaas/cookiecutter-poetry).

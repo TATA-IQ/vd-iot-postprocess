@@ -1,0 +1,524 @@
+1, 1, initialization time, 629.052692
+1, 1, initialization time, 885.869952
+1, 1, initialization time, 989.199101
+1, 1, initialization time, 1044.300089
+1, 1, model response time, 1044.60491
+1, 1, initialization time, 1168.645133
+1, 1, model response time, 1169.001494
+1, 1, initialization time, 5816.866353
+1, 1, initialization time, 5844.471585
+1, 1, initialization time, 5875.087266
+1, 1, model response time, 5875.74606
+1, 1, initialization time, 5986.348714
+1, 1, model response time, 5986.798777
+1, 1, initialization time, 6143.997018
+1, 1, model response time, 6144.486893
+1, 1, initialization time, 6180.444905
+1, 1, model response time, 6180.84695
+1, 1, initialization time, 6215.1075
+1, 1, model response time, 6215.53883
+1, 1, initialization time, 6601.766575
+1, 1, model response time, 6602.238608
+2, 1, initialization time, 6602.240499
+2, 1, model response time, 6607.414313
+1, 1, initialization time, 6959.032098
+1, 1, model response time, 6959.526575
+2, 1, initialization time, 6959.528827
+2, 1, model response time, 6960.089794
+1, 1, initialization time, 7027.536217
+1, 1, model response time, 7027.962479
+2, 1, initialization time, 7027.96649
+2, 1, model response time, 7028.382749
+1, 1, initialization time, 7082.582549
+1, 1, model response time, 7083.055229
+2, 1, initialization time, 7083.058215
+2, 1, model response time, 7083.508011
+1, 1, initialization time, 7140.701248
+1, 1, model response time, 7141.063417
+2, 1, initialization time, 7141.065722
+2, 1, model response time, 7141.500016
+1, 1, initialization time, 7207.720951
+1, 1, model response time, 7208.148026
+2, 1, initialization time, 7208.149841
+2, 1, model response time, 7208.645409
+1, 1, initialization time, 7245.082985
+1, 1, model response time, 7245.490963
+2, 1, initialization time, 7245.493311
+2, 1, model response time, 7245.927446
+2, 1, model response time, 7246.334381
+1, 1, initialization time, 7249.32458
+1, 1, model response time, 7249.730093
+2, 1, initialization time, 7249.732445
+2, 1, model response time, 7250.186949
+2, 1, model response time, 7250.567041
+1, 1, initialization time, 7253.975486
+1, 1, model response time, 7254.427028
+2, 1, initialization time, 7254.429082
+2, 1, model response time, 7254.89366
+2, 1, model response time, 7255.31378
+1, 1, initialization time, 7258.572364
+1, 1, model response time, 7258.960537
+2, 1, initialization time, 7258.962143
+2, 1, model response time, 7259.475217
+2, 1, model response time, 7259.950448
+1, 1, initialization time, 7262.78469
+1, 1, model response time, 7263.172378
+2, 1, initialization time, 7263.17433
+2, 1, model response time, 7263.616533
+2, 1, model response time, 7264.073341
+1, 1, initialization time, 7267.246434
+1, 1, model response time, 7267.741239
+2, 1, initialization time, 7267.742892
+2, 1, model response time, 7268.241422
+2, 1, model response time, 7268.622509
+1, 1, initialization time, 7271.858701
+1, 1, model response time, 7272.221316
+2, 1, initialization time, 7272.223218
+2, 1, model response time, 7272.667805
+2, 1, model response time, 7273.084377
+1, 1, initialization time, 7276.263671
+1, 1, model response time, 7276.615528
+2, 1, initialization time, 7276.617452
+2, 1, model response time, 7277.09479
+2, 1, model response time, 7277.466123
+1, 1, initialization time, 7280.599219
+1, 1, model response time, 7280.980395
+2, 1, initialization time, 7280.981952
+2, 1, model response time, 7281.350254
+2, 1, model response time, 7281.778462
+1, 1, initialization time, 7285.152103
+1, 1, model response time, 7285.61109
+2, 1, initialization time, 7285.612849
+2, 1, model response time, 7285.983703
+2, 1, model response time, 7286.383771
+1, 1, initialization time, 7289.435282
+1, 1, model response time, 7289.872362
+2, 1, initialization time, 7289.874841
+2, 1, model response time, 7290.290723
+2, 1, model response time, 7290.711245
+1, 1, initialization time, 7293.640302
+1, 1, model response time, 7294.032538
+2, 1, initialization time, 7294.034881
+2, 1, model response time, 7294.480649
+2, 1, model response time, 7294.887347
+1, 1, initialization time, 7298.223121
+1, 1, model response time, 7298.656202
+2, 1, initialization time, 7298.65836
+2, 1, model response time, 7299.173911
+2, 1, model response time, 7299.573471
+1, 1, initialization time, 7302.912006
+1, 1, model response time, 7303.35706
+2, 1, initialization time, 7303.35906
+2, 1, model response time, 7303.7885
+2, 1, model response time, 7304.226221
+1, 1, initialization time, 7307.5427
+1, 1, model response time, 7307.935811
+2, 1, initialization time, 7307.937819
+2, 1, model response time, 7308.340535
+2, 1, model response time, 7308.743481
+1, 1, initialization time, 7312.054231
+1, 1, model response time, 7312.405813
+2, 1, initialization time, 7312.407895
+2, 1, model response time, 7312.851664
+2, 1, model response time, 7313.259837
+1, 1, initialization time, 7316.854571
+1, 1, model response time, 7317.217041
+2, 1, initialization time, 7317.218597
+2, 1, model response time, 7317.604142
+2, 1, model response time, 7318.068912
+1, 1, initialization time, 7321.267862
+1, 1, model response time, 7321.746067
+2, 1, initialization time, 7321.748532
+2, 1, model response time, 7322.157704
+2, 1, model response time, 7322.574643
+1, 1, initialization time, 7325.309134
+1, 1, model response time, 7325.698284
+2, 1, initialization time, 7325.700635
+2, 1, model response time, 7326.163339
+2, 1, model response time, 7326.58188
+1, 1, initialization time, 7329.679843
+1, 1, model response time, 7330.035878
+2, 1, initialization time, 7330.037494
+2, 1, model response time, 7330.482888
+2, 1, model response time, 7330.874848
+1, 1, initialization time, 7333.827905
+1, 1, model response time, 7334.217094
+2, 1, initialization time, 7334.218903
+2, 1, model response time, 7334.682192
+2, 1, model response time, 7335.047018
+1, 1, initialization time, 7338.254466
+1, 1, model response time, 7338.672045
+2, 1, initialization time, 7338.674527
+2, 1, model response time, 7339.080943
+2, 1, model response time, 7339.468856
+1, 1, initialization time, 7342.911529
+1, 1, model response time, 7343.314572
+2, 1, initialization time, 7343.316072
+2, 1, model response time, 7343.698781
+2, 1, model response time, 7344.189486
+1, 1, initialization time, 7347.506162
+1, 1, model response time, 7347.904857
+2, 1, initialization time, 7347.906934
+2, 1, model response time, 7348.259064
+2, 1, model response time, 7348.700657
+1, 1, initialization time, 7352.123929
+1, 1, model response time, 7352.513153
+2, 1, initialization time, 7352.514732
+2, 1, model response time, 7352.884348
+2, 1, model response time, 7353.294569
+1, 1, initialization time, 7356.757509
+1, 1, model response time, 7357.203695
+2, 1, initialization time, 7357.20548
+2, 1, model response time, 7357.565074
+2, 1, model response time, 7357.96332
+1, 1, initialization time, 7361.253303
+1, 1, model response time, 7361.648307
+2, 1, initialization time, 7361.650102
+2, 1, model response time, 7362.08838
+2, 1, model response time, 7362.460264
+1, 1, initialization time, 7365.957378
+1, 1, model response time, 7366.435025
+2, 1, initialization time, 7366.436955
+2, 1, model response time, 7366.88494
+2, 1, model response time, 7367.318722
+1, 1, initialization time, 7370.383283
+1, 1, model response time, 7370.820567
+2, 1, initialization time, 7370.822279
+2, 1, model response time, 7371.213369
+2, 1, model response time, 7371.682229
+1, 1, initialization time, 7374.813041
+1, 1, model response time, 7375.263757
+2, 1, initialization time, 7375.265754
+2, 1, model response time, 7375.74301
+2, 1, model response time, 7376.175542
+1, 1, initialization time, 7379.328633
+1, 1, model response time, 7379.733108
+2, 1, initialization time, 7379.734628
+2, 1, model response time, 7380.171139
+2, 1, model response time, 7380.661193
+1, 1, initialization time, 7383.8671
+1, 1, model response time, 7384.323694
+2, 1, initialization time, 7384.325639
+2, 1, model response time, 7384.749636
+2, 1, model response time, 7385.236902
+1, 1, initialization time, 7388.270438
+1, 1, model response time, 7388.707799
+2, 1, initialization time, 7388.709687
+2, 1, model response time, 7389.114252
+2, 1, model response time, 7389.550592
+1, 1, initialization time, 7392.792985
+1, 1, model response time, 7393.203185
+2, 1, initialization time, 7393.205575
+2, 1, model response time, 7393.609552
+2, 1, model response time, 7394.108934
+1, 1, initialization time, 7397.282167
+1, 1, model response time, 7397.700848
+2, 1, initialization time, 7397.702813
+2, 1, model response time, 7398.106457
+2, 1, model response time, 7398.555163
+1, 1, initialization time, 7401.706725
+1, 1, model response time, 7402.160256
+2, 1, initialization time, 7402.162274
+2, 1, model response time, 7402.578904
+2, 1, model response time, 7403.001829
+1, 1, initialization time, 7406.142921
+1, 1, model response time, 7406.541846
+2, 1, initialization time, 7406.544306
+2, 1, model response time, 7406.95162
+2, 1, model response time, 7407.373167
+1, 1, initialization time, 7410.727456
+1, 1, model response time, 7411.118367
+2, 1, initialization time, 7411.120216
+2, 1, model response time, 7411.610456
+2, 1, model response time, 7412.037811
+1, 1, initialization time, 7415.482774
+1, 1, model response time, 7415.911802
+2, 1, initialization time, 7415.914239
+2, 1, model response time, 7416.332821
+2, 1, model response time, 7416.745581
+1, 1, initialization time, 7420.073839
+1, 1, model response time, 7420.582381
+2, 1, initialization time, 7420.584469
+2, 1, model response time, 7421.009636
+2, 1, model response time, 7421.358884
+1, 1, initialization time, 7424.704701
+1, 1, model response time, 7425.126013
+2, 1, initialization time, 7425.128682
+2, 1, model response time, 7425.568214
+2, 1, model response time, 7425.968342
+1, 1, initialization time, 7428.973244
+1, 1, model response time, 7429.398658
+2, 1, initialization time, 7429.400742
+2, 1, model response time, 7429.878075
+2, 1, model response time, 7430.290265
+1, 1, initialization time, 7433.459492
+1, 1, model response time, 7433.867093
+2, 1, initialization time, 7433.868932
+2, 1, model response time, 7434.309666
+2, 1, model response time, 7434.703611
+1, 1, initialization time, 7438.076112
+1, 1, model response time, 7438.452337
+2, 1, initialization time, 7438.454511
+2, 1, model response time, 7438.848391
+2, 1, model response time, 7439.227415
+1, 1, initialization time, 7442.578261
+1, 1, model response time, 7442.948182
+2, 1, initialization time, 7442.949972
+2, 1, model response time, 7443.440332
+2, 1, model response time, 7443.841796
+1, 1, initialization time, 7447.36457
+1, 1, model response time, 7447.745391
+2, 1, initialization time, 7447.747481
+2, 1, model response time, 7448.213586
+2, 1, model response time, 7448.603097
+1, 1, initialization time, 7452.046941
+1, 1, model response time, 7452.467647
+2, 1, initialization time, 7452.471053
+2, 1, model response time, 7452.90812
+2, 1, model response time, 7453.352496
+1, 1, initialization time, 7456.773867
+1, 1, model response time, 7457.191677
+2, 1, initialization time, 7457.193246
+2, 1, model response time, 7457.624787
+2, 1, model response time, 7458.034243
+1, 1, initialization time, 7461.432373
+1, 1, model response time, 7461.84657
+2, 1, initialization time, 7461.85094
+2, 1, model response time, 7462.279061
+2, 1, model response time, 7462.685268
+1, 1, initialization time, 7466.072761
+1, 1, model response time, 7466.47993
+2, 1, initialization time, 7466.483797
+2, 1, model response time, 7466.915893
+2, 1, model response time, 7467.364248
+1, 1, initialization time, 7470.627364
+1, 1, model response time, 7470.994609
+2, 1, initialization time, 7470.998077
+2, 1, model response time, 7471.374752
+2, 1, model response time, 7471.738346
+1, 1, initialization time, 7475.391816
+1, 1, model response time, 7475.783059
+2, 1, initialization time, 7475.784917
+2, 1, model response time, 7476.248917
+2, 1, model response time, 7476.701352
+1, 1, initialization time, 7480.025279
+1, 1, model response time, 7480.391889
+2, 1, initialization time, 7480.393505
+2, 1, model response time, 7480.872655
+2, 1, model response time, 7481.342288
+1, 1, initialization time, 7484.529887
+1, 1, model response time, 7484.959727
+2, 1, initialization time, 7484.962958
+2, 1, model response time, 7485.434451
+2, 1, model response time, 7485.855629
+1, 1, initialization time, 7489.219217
+1, 1, model response time, 7489.568008
+2, 1, initialization time, 7489.570427
+2, 1, model response time, 7489.96982
+2, 1, model response time, 7490.421205
+1, 1, initialization time, 7493.82247
+1, 1, model response time, 7494.232217
+2, 1, initialization time, 7494.234483
+2, 1, model response time, 7494.634045
+2, 1, model response time, 7495.089848
+1, 1, initialization time, 7498.445212
+1, 1, model response time, 7498.830151
+2, 1, initialization time, 7498.833985
+2, 1, model response time, 7499.317566
+2, 1, model response time, 7499.765703
+1, 1, initialization time, 7502.978073
+1, 1, model response time, 7503.316608
+2, 1, initialization time, 7503.319218
+2, 1, model response time, 7503.83914
+2, 1, model response time, 7504.261394
+1, 1, initialization time, 7507.492665
+1, 1, model response time, 7507.841075
+2, 1, initialization time, 7507.84366
+2, 1, model response time, 7508.285514
+2, 1, model response time, 7508.703578
+1, 1, initialization time, 7511.975961
+1, 1, model response time, 7512.379958
+2, 1, initialization time, 7512.382861
+2, 1, model response time, 7512.861491
+2, 1, model response time, 7513.269866
+1, 1, initialization time, 7516.536236
+1, 1, model response time, 7516.937823
+2, 1, initialization time, 7516.941516
+2, 1, model response time, 7517.374104
+2, 1, model response time, 7517.835573
+1, 1, initialization time, 7521.200144
+1, 1, model response time, 7521.631765
+2, 1, initialization time, 7521.633577
+2, 1, model response time, 7522.05933
+2, 1, model response time, 7522.479361
+1, 1, initialization time, 7525.804497
+1, 1, model response time, 7526.231057
+2, 1, initialization time, 7526.233327
+2, 1, model response time, 7526.706295
+2, 1, model response time, 7527.111767
+1, 1, initialization time, 7530.413777
+1, 1, model response time, 7530.779265
+2, 1, initialization time, 7530.782388
+2, 1, model response time, 7531.211422
+2, 1, model response time, 7531.666681
+1, 1, initialization time, 7534.963671
+1, 1, model response time, 7535.392402
+2, 1, initialization time, 7535.396963
+2, 1, model response time, 7535.805807
+2, 1, model response time, 7536.237572
+1, 1, initialization time, 7539.460069
+1, 1, model response time, 7539.907196
+2, 1, initialization time, 7539.909975
+2, 1, model response time, 7540.352544
+2, 1, model response time, 7540.734448
+1, 1, initialization time, 7544.076465
+1, 1, model response time, 7544.473646
+2, 1, initialization time, 7544.475281
+2, 1, model response time, 7544.885792
+2, 1, model response time, 7545.281311
+1, 1, initialization time, 7548.697895
+1, 1, model response time, 7549.049579
+2, 1, initialization time, 7549.051564
+2, 1, model response time, 7549.463143
+2, 1, model response time, 7549.841922
+1, 1, initialization time, 7553.019277
+1, 1, model response time, 7553.42549
+2, 1, initialization time, 7553.429305
+2, 1, model response time, 7553.860992
+2, 1, model response time, 7554.318297
+1, 1, initialization time, 7557.553636
+1, 1, model response time, 7558.014109
+2, 1, initialization time, 7558.01711
+2, 1, model response time, 7558.499155
+2, 1, model response time, 7558.934755
+1, 1, initialization time, 7561.96626
+1, 1, model response time, 7562.342441
+2, 1, initialization time, 7562.343972
+2, 1, model response time, 7562.765831
+2, 1, model response time, 7563.162323
+1, 1, initialization time, 7566.153924
+1, 1, model response time, 7566.519034
+2, 1, initialization time, 7566.520893
+2, 1, model response time, 7566.958765
+2, 1, model response time, 7567.385055
+1, 1, initialization time, 7570.558459
+1, 1, model response time, 7570.984729
+2, 1, initialization time, 7570.987756
+2, 1, model response time, 7571.37753
+2, 1, model response time, 7571.786619
+1, 1, initialization time, 7574.921782
+1, 1, model response time, 7575.317964
+2, 1, initialization time, 7575.320543
+2, 1, model response time, 7575.703191
+2, 1, model response time, 7576.087495
+1, 1, initialization time, 7579.22788
+1, 1, model response time, 7579.630928
+2, 1, initialization time, 7579.63294
+2, 1, model response time, 7580.079725
+2, 1, model response time, 7580.554981
+1, 1, initialization time, 7583.832589
+1, 1, model response time, 7584.267148
+2, 1, initialization time, 7584.268875
+2, 1, model response time, 7584.710559
+2, 1, model response time, 7585.12541
+1, 1, initialization time, 7588.399419
+1, 1, model response time, 7588.853672
+2, 1, initialization time, 7588.855276
+2, 1, model response time, 7589.250389
+2, 1, model response time, 7589.699806
+1, 1, initialization time, 7592.296377
+1, 1, model response time, 7592.724356
+2, 1, initialization time, 7592.726675
+2, 1, model response time, 7593.254003
+2, 1, model response time, 7593.654059
+1, 1, initialization time, 7596.883866
+1, 1, model response time, 7597.284706
+2, 1, initialization time, 7597.287347
+2, 1, model response time, 7597.680687
+2, 1, model response time, 7598.064342
+1, 1, initialization time, 7601.570978
+1, 1, model response time, 7601.960876
+2, 1, initialization time, 7601.963018
+2, 1, model response time, 7602.381466
+2, 1, model response time, 7602.833752
+1, 1, initialization time, 7605.947243
+1, 1, model response time, 7606.31856
+2, 1, initialization time, 7606.329252
+2, 1, model response time, 7606.745067
+2, 1, model response time, 7607.155789
+1, 1, initialization time, 7610.518942
+1, 1, model response time, 7610.92503
+2, 1, initialization time, 7610.928419
+2, 1, model response time, 7611.326718
+2, 1, model response time, 7611.744381
+1, 1, initialization time, 7614.927068
+1, 1, model response time, 7615.326325
+2, 1, initialization time, 7615.328032
+2, 1, model response time, 7615.765834
+2, 1, model response time, 7616.15711
+1, 1, initialization time, 7619.239779
+1, 1, model response time, 7619.638822
+2, 1, initialization time, 7619.642495
+2, 1, model response time, 7620.050737
+2, 1, model response time, 7620.47248
+1, 1, initialization time, 7623.924491
+1, 1, model response time, 7624.293219
+2, 1, initialization time, 7624.295974
+2, 1, model response time, 7624.697402
+2, 1, model response time, 7625.094528
+1, 1, initialization time, 7628.461664
+1, 1, model response time, 7628.826095
+2, 1, initialization time, 7628.827615
+2, 1, model response time, 7629.27701
+2, 1, model response time, 7629.705138
+1, 1, initialization time, 7633.014991
+1, 1, model response time, 7633.369885
+2, 1, initialization time, 7633.373527
+2, 1, model response time, 7633.763388
+2, 1, model response time, 7634.245203
+1, 1, initialization time, 7637.478241
+1, 1, model response time, 7637.843465
+2, 1, initialization time, 7637.848946
+2, 1, model response time, 7638.282611
+2, 1, model response time, 7638.69367
+1, 1, initialization time, 7641.959517
+1, 1, model response time, 7642.358988
+2, 1, initialization time, 7642.362348
+2, 1, model response time, 7642.821085
+2, 1, model response time, 7643.254665
+1, 1, initialization time, 7646.706535
+1, 1, model response time, 7647.127376
+2, 1, initialization time, 7647.129256
+1, 1, initialization time, 9913.495915
+1, 1, model response time, 9914.061762
+2, 1, initialization time, 9914.066225
+2, 1, model response time, 9914.637772
+2, 1, model response time, 9915.019417
+1, 1, initialization time, 10317.847836
+1, 1, model response time, 10318.384054
+1, 1, initialization time, 10423.775405
+1, 1, model response time, 10424.37976
+1, 1, initialization time, 10489.521314
+1, 1, model response time, 10490.171646
+1, 1, initialization time, 10531.735348
+1, 1, model response time, 10532.291763
+1, 1, initialization time, 10898.587824
+1, 1, model response time, 10899.335289
+1, 1, initialization time, 10947.382046
+1, 1, model response time, 10947.8677
+1, 1, initialization time, 11741.002157
+1, 1, model response time, 11741.45843
+1, 1, initialization time, 11773.614455
+1, 1, model response time, 11774.099289
+1, 1, initialization time, 11985.862796
+1, 1, model response time, 11986.452871
+1, 1, initialization time, 11994.647916
+1, 1, model response time, 11995.140029
+1, 1, initialization time, 12171.251936
+1, 1, model response time, 12171.807659
+1, 1, initialization time, 12186.012365
+1, 1, model response time, 12186.522109
+1, 1, initialization time, 12205.558642
+1, 1, model response time, 12206.123108
+1, 1, initialization time, 12263.21492
+1, 1, model response time, 12263.831713

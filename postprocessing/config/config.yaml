@@ -1,0 +1,17 @@
+---
+apis:
+  camera_group: "http://127.0.0.1:8000/getCameraGroup"
+  preprocess_config: "http://127.0.0.1:8000/getCameraGroup"
+  schedule_config: "http://127.0.0.1:8000/getCameraConfig"
+  postprocess_config: "http://localhost:8000/getpostprocess"
+  usecase_urls: "http://127.0.0.1:8000/getusecase"
+  classes: "http://localhost:8000/getclasses"
+  computation: "http://localhost:8000/getcomputation"
+  incidents: "http://localhost:8000/getincidents"
+  boundary_config: "http://localhost:8000/getboundary"
+
+kafka:
+  - 172.16.0.175:9092
+  - 172.16.0.171:9092
+  - 172.16.0.174:9092
+
