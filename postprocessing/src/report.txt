@@ -1,0 +1,27 @@
+TensorFlow 2.0 Upgrade Script
+-----------------------------
+Converted 1 files
+Detected 0 issues that require attention
+--------------------------------------------------------------------------------
+================================================================================
+Detailed log follows:
+
+================================================================================
+================================================================================
+Input tree: 'test/'
+================================================================================
+--------------------------------------------------------------------------------
+Processing file 'test/test.py'
+ outputting to 'encode_image/test.py'
+--------------------------------------------------------------------------------
+
+5:23: INFO: Renamed 'tf.Session' to 'tf.compat.v1.Session'
+6:13: INFO: Renamed 'tf.gfile.GFile' to 'tf.io.gfile.GFile'
+7:24: INFO: Renamed 'tf.GraphDef' to 'tf.compat.v1.GraphDef'
+11:29: INFO: Renamed 'tf.get_default_graph' to 'tf.compat.v1.get_default_graph'
+12:30: INFO: Renamed 'tf.get_default_graph' to 'tf.compat.v1.get_default_graph'
+14:38: INFO: Renamed 'tf.get_default_graph' to 'tf.compat.v1.get_default_graph'
+15:29: INFO: Renamed 'tf.get_default_graph' to 'tf.compat.v1.get_default_graph'
+16:30: INFO: Renamed 'tf.get_default_graph' to 'tf.compat.v1.get_default_graph'
+--------------------------------------------------------------------------------
+

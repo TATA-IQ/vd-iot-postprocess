@@ -1,13 +1,23 @@
-from src.detectionclass import DetectionProcess
-from src.annotation import AnnotateImage
-class CrowdTemplate(DetectionProcess,AnnotateImage):
-    def __init__(self,detected_class,expected_class,frame):
-        DetectionProcess.__init__(self,detected_class,expected_class)
+from src.common_template import Template
+from src.incidents import IncidentExtract
+class CrowdTemplate(Template,IncidentExtract):
+    def __init__(self,image,image_name,camera_id,image_time,steps,frame,incidents):
+        print("====Initializing crowd=====")
+        self.frame=image
+        self.allsteps=steps
+        self.incidents=incidents
+        Template.__init__(self,image,image_name,camera_id,image_time,steps,frame)
     def process_data(self):
-        filtered_res=self.process()
-        AnnotateImage.__init__(self,detected_class,expected_class)
-        image=self.annotate()
-        return filtered_res,image
+        print("==============Data==========")
+        
+        filtered_res_dict=self.process_steps()
+        print("====Process called=======")
+        print(filtered_res_dict)
+        IncidentExtract.__init__(self,filtered_res_dict,self.incidents,self.allsteps)
+        incident_dict=self.process_incident()
+        print("=========incident dict======")
+        print(incident_dict)
+        return filtered_res_dict, incident_dict
 
 
 
