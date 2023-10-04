@@ -80,6 +80,10 @@ class PostProcessingApp():
         #Crowd Template
         # ct=CrowdTemplate(self.image,self.image_name,self.camera_id,self.image_time,self.steps,self.frame,self.incidents)
         # ct.process_data()
+        #PPE Tempmplate
+       
+        ppe=PPETemplate(self.image,self.image_name,self.camera_id,self.image_time,self.steps,self.frame,self.incidents,self.usecase_id,tracker,self.rcon)
+        ppe.process_data()
     
     def process(self):
         #print("=========",self.camera_id,self.usecase_id)

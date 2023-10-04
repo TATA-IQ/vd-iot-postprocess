@@ -50,6 +50,30 @@ class Computation():
     
     def svd(self):
         pass
+
+    def ddp_computation(self,detecton):
+        misc=[]
+        dictres={}
+        print("======self.detection======")
+        print(self.detection_output)
+        if "prediction_class" in self.detection_output:
+            for i in self.detection_output["prediction_class"]:
+                print("=======i======",i)
+                dictres["overlap"]=overlap
+                dictres["id"]=i["id"]
+            
+            for k,v in dictres.items():
+                tempdict={}
+                tempdict[k]=v
+                
+                misc.append(tempdict)
+            
+            if "misc" in self.detection_output:
+                
+                self.detection_output["misc"].extend(misc)
+            else:
+                self.detection_output["misc"]=misc
+        return self.detection_output
     
     def process_computation(self):
         compute_name=self.steps["computation_name"]

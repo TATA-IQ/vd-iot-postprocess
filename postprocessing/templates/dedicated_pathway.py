@@ -1,12 +1,14 @@
 from src.common_template import Template
 from src.incidents import IncidentExtract
-class DedicatedPathway(Template,Caching,IncidentExtract):
+from src.postprocessing_template import 
+class DedicatedPathway(Template,Caching,IncidentExtract,PostProcessing):
     def __init__(self,image,image_name,camera_id,image_time,steps,frame,incidents,usecase_id,tracker=None,rcon=None):
         print("====Initializing crowd=====")
         self.frame=image
         self.allsteps=steps
         self.tracker=tracker
         self.incidents=incidents
+        
         Template.__init__(self,image,image_name,camera_id,image_time,steps,frame)
         if self.rcon is not None:
             print("=======cahching initialization=====")
@@ -27,32 +29,80 @@ class DedicatedPathway(Template,Caching,IncidentExtract):
         self.setbykey("ddp",self.camera_id,self.usecase_id,cachedict)
         print("=====cache dict saved to cache")
     
-    def ddp_postprocessing(self,filtered_res_dict):
-        detected_list_ovrlap=[]
-        
-        if len(filtered_res_dict)>0:
-            for detclass in detectionres:
-                xmin_l, ymin_l, xmax_l, ymax_l = int(detclass['xmin']), int(detclass['ymax']) - int(0.1*(int(detclass['ymax'])-int(detclass['ymin']))), int(detclass['xmax']), int(detclass['ymax'])
-                leg_area = np.array([[xmin_l,ymin_l], [xmin_l,ymax_l], [xmax_l, ymax_l], [xmax_l,ymin_l]])
-                image_new = np.zeros([image.shape[0],image.shape[1],1],dtype=np.uint8)
-                image_new = cv2.fillPoly(image_new, pts =[leg_area], color=(255,255,255))
-                img_final = image_new*mask
-                count = np.count_nonzero(img_final>0)
-                count_pc = 100*count/((xmax_l-xmin_l)*(ymax_l-ymin_l))
-                detclass["in_pathway"]=count_pc
-                detected_list_ovrlap.append(detclass)
-        return detected_list_ovrlap, img_final
+    
             
+
+    def process_steps(self):
+        steps_keys=list(map(lambda x: int(x),list(self.steps.keys())))
+        steps_keys.sort()
+        #print("========steps keys extracted=====")
+        for ki in steps_keys:
+            
+            step=self.steps[str(ki)]
+            if step["step_type"]=="model":
+                
+                
+                self.expected_class.extend(list(step["classes"].values()))
+                #print("=======inside model===")
+                self.model_call(step)
+                #print("====inside step model===")
+                if len(self.detected_class)>0:
+                    self.detection_init()
+                    
+                    filtered_res=self.process_detection()
+                    self.filtered_output.extend(filtered_res)
+                    self.final_prediction["prediction_class"]=self.filtered_output
+                if self.mask is not None:
+                    self.final_prediction["prediction_class"]=self.masked_detection(self.frame,self.mask, filtered_res_dict)
+
+            if step["step_type"]=="computation":
+                Computation.__init__(self,self.final_prediction,step,self.frame)
+                 self.final_prediction=self.ddp_computation(self.final_prediction)
+            
+        
+
+
+
 
 
     
     def process_data(self):
         print("==============Data==========")
-        
+        prexistdata=None
         filtered_res_dict=self.process_steps()
         print("====Process called=======")
         print(filtered_res_dict)
-        self.ddp_postprocessing(filtered_res_dict)
+        self.process_steps()
+        data=self.getbykey("ddp",self.usecase_id,self.camera_id)
+        if data is not None:
+            prexistdata=data
+            if len(data)>9:
+                data[0]=self.final_prediction
+            else:
+                data.append(self.final_prediction)
+        else:
+            data=[self.final_prediction]
+        self.setbykey("ddp",self.usecase_id,self.camera_id,data)
+        IncidentExtract.__init__(self,self.final_prediction,self.incident,self.steps)
+        
+        #prepare the data to save
+        # if prexistdata is not None:
+        #     PostProcessing(self.final_prediction,prexistdata)
+        #     if self.tracker is not None:
+        #         common,uncommon=self.filter_data_by_id()
+        #     else:
+        #         common,uncommon=self.filter_data_by_overlap()
+        # self.final_prediction["prediction_class"]=uncommon
+        
+
+    
+            
+
+
+
+        
+
+        
 
 
 

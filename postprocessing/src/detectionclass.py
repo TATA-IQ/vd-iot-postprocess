@@ -29,5 +29,20 @@ class DetectionProcess():
                     listresult.append(detc)
         # print("====end of detectec class======")
         return listresult
+    
+    def masked_detection(self,image,mask,detections):
+        masked_detection=[]
+        for det in detections:
+            xmin_l, ymin_l, xmax_l, ymax_l = int(detclass['xmin']), int(detclass['ymax']) - int(0.1*(int(detclass['ymax'])-int(detclass['ymin']))), int(detclass['xmax']), int(detclass['ymax'])
+            print('lecord:'+str(xmin_l)+', '+str(ymin_l)+', '+str(xmax_l)+', '+str(ymax_l))
+            leg_area = np.array([[xmin_l,ymin_l], [xmin_l,ymax_l], [xmax_l, ymax_l], [xmax_l,ymin_l]])
+            image_new = np.zeros([image.shape[0],image.shape[1],1],dtype=np.uint8)
+            image_new = cv2.fillPoly(image_new, pts =[leg_area], color=(255,255,255))
+            img_final = image_new*mask  #cv2.bitwise_and(image_new, image_new, mask=mask)
+            count = np.count_nonzero(img_final>0)
+            count_pc = 100*count/((xmax_l-xmin_l)*(ymax_l-ymin_l))
+            det["overlaped"]=count_pc
+            masked_detection.append(det)
+        return masked_detection
 
 
