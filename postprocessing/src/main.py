@@ -82,7 +82,7 @@ class PostProcessingApp():
         # ct.process_data()
     
     def process(self):
-        print("=========",self.camera_id,self.usecase_id)
+        #print("=========",self.camera_id,self.usecase_id)
         if int(self.camera_id)==3 and int(self.usecase_id)==2:
             self.call_template()
 

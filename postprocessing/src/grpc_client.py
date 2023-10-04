@@ -25,14 +25,21 @@ class GRPCClient(object):
         #"usecase_id":usecase_id,"cameraid":cameraid,"bboxes":bboxes
         #{"usecase_id":usecase_id,"cameraid":cameraid,"image":frame,"bboxes":bboxes}
         #,bboxes=[message["bboxes"].tolist()[0]]
-        print("=====GRPC Calling===")
-        print(type(message["usecase_id"]))
-        print(type(message["cameraid"]))
-        print(type(message["image"]))
-        print("shape====",message["bboxes"].shape)
-        message = trackgrpc_pb2.TrackRequest(usecase_id=str(message["usecase_id"]),cameraid=str(message["cameraid"]),image=message["image"],bbox=np.ndarray.tobytes(np.array(message["bboxes"])))
+        # print("=====GRPC Calling===")
+        # print(type(message["usecase_id"]))
+        # print(type(message["cameraid"]))
+        # print(type(message["image"]))
+        print("====bboxes====")
+        print("shape====",message["bboxes"])
+        message = trackgrpc_pb2.TrackRequest(usecase_id=str(message["usecase_id"]),cameraid=str(message["cameraid"]),image=message["image"],bbox=message["bboxes"].tobytes())
         
         message_val=self.stub.gettrack(message)
         
-        feature=np.frombuffer(message_val.feature, dtype=np.uint16)
-        return message_val.usecase_id,message_val.cameraid, feature.reshape(int( len(feature)/128),128)
+        
+        feature=np.frombuffer(message_val.feature, dtype=np.float32)
+        feature=np.array(feature).reshape(int(len(feature)/128),128)
+        print("===feature shape====")
+        print(feature.shape)
+        # newfeature=[i[0] for i in feature ]
+        # newfeature=np.array(newfeature).reshape(int( len(newfeature)/128),128)
+        return message_val.usecase_id,message_val.cameraid, feature

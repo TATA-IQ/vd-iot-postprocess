@@ -1,7 +1,8 @@
 class DetectionProcess():
-    def __init__(self,detected_class, expected_class):
+    def __init__(self,detected_class, expected_class,image_time):
         self.detected_class=detected_class
         self.expected_class=expected_class
+        self.image_time=image_time
     
     
 
@@ -11,8 +12,8 @@ class DetectionProcess():
         uploaded_class_name_id= [i["class_id"] for i in self.expected_class]
         
         listresult=[]
-        print("====expected class====")
-        print(self.expected_class)
+        # print("====expected class====")
+        # print(self.expected_class)
         for detc in self.detected_class:
             
             if detc["class_name"] in uploaded_class_name_list:
@@ -24,6 +25,7 @@ class DetectionProcess():
                 if detc["score"]>=expected_class["class_conf"]:
                     detc["class_name"]=expected_class["class_name"]
                     detc["class_id"] = str(expected_class["class_id"])
+                    detc["image_time"]=str(self.image_time)
                     listresult.append(detc)
         # print("====end of detectec class======")
         return listresult

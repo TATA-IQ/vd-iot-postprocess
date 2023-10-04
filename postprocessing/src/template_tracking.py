@@ -32,29 +32,33 @@ class TemplateTracking():
         
 
     def track(self,frame,detection_output):
-        print("====inside track======")
+        #print("====inside track======")
         tracker_obj=self.tracking_load()
         detections=[]
         list_det=[]
-        print("=====tracker obj=====")
-        print(tracker_obj)
-        print(detection_output)
+        # print("=====tracker obj=====")
+        # print(tracker_obj)
+        # print(detection_output)
         for d in detection_output:
-            list_det.append([int(d["xmin"]),int(d["ymin"]),int(d["xmax"]),int(d["ymax"]),int(d["class_id"])])
-        print("======tracker obj=====")
-        print(tracker_obj)
-        print(list_det)
+            list_det.append([int(d["xmin"]),int(d["ymin"]),int(d["xmax"]),int(d["ymax"]),float(d["score"])])
+        # print("======tracker obj=====")
+        # print(tracker_obj)
+        # print(list_det)
 
-        print("===updating track====")
-        print(list_det)
-        tracker_obj.update(self.usecase_id,self.camera_id,self.grpcclient,frame,list_det)
+        # print("===updating track====")
+        # print(list_det)
+        if len(list_det)>0:
+            tracker_obj.update(self.usecase_id,self.camera_id,self.grpcclient,frame,list_det)
 
         print("===track updated===")
-        print(list(tracker_obj.tracks))
+        
+        print("=========Length of detection",len(detection_output), len(list_det))
+        if tracker_obj.tracks is  not None:
 
-        for trk,det in zip(tracker_obj.tracks,detection_output):
-            # print("===>",det)
-            det["id"]=trk.track_id
-            detections.append(det)
-        self.tracking_save(tracker_obj)
+            for trk,det in zip(tracker_obj.tracks,detection_output):
+                # print("======inside tracker=====")
+                # print("===>",trk.__dir__())
+                det["id"]=trk.track_id
+                detections.append(det)
+            self.tracking_save(tracker_obj)
         return detections

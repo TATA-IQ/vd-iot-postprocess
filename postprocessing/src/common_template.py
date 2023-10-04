@@ -45,7 +45,7 @@ class Template(Model,DetectionProcess,Computation):
 
         
     def detection_init(self):
-        DetectionProcess.__init__(self,self.detected_class,self.expected_class)
+        DetectionProcess.__init__(self,self.detected_class,self.expected_class, self.image_time)
 
     def process_steps(self):
         #print("=====template step proces=====")

@@ -14,9 +14,9 @@ class Tracker:
         max_cosine_distance = 0.5
         nn_budget = None
 
-        encoder_model_filename = 'data_model/mars-small128.pb'
+        # encoder_model_filename = 'data_model/mars-small128.pb'
 
-        metric = nn_matching.NearestNeighborDistanceMetric("euclidean", max_cosine_distance, nn_budget)
+        metric = nn_matching.NearestNeighborDistanceMetric("cosine", max_cosine_distance, nn_budget)
         self.tracker = DeepSortTracker(metric)
     
     def update_encoder(self,encoder=None):
@@ -47,6 +47,8 @@ class Tracker:
 
         dets = []
         for bbox_id, bbox in enumerate(bboxes):
+            print("=====enumerate boxes====")
+            # print(features[bbox_id])
             dets.append(Detection(bbox, scores[bbox_id], features[bbox_id]))
 
         self.tracker.predict()

@@ -12,9 +12,13 @@ from src.parser import Config
 import json
 from src.image_encoder import ImageEncoder
 import os
+from shared_memory_dict import SharedMemoryDict
 from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
 os.environ['TF_ENABLE_MLIR_OPTIMIZATIONS'] = '1'
 import tensorflow as tf
+os.environ["SHARED_MEMORY_USE_LOCK"] = "1"
+
+
 app=FastAPI()
 pool = redis.ConnectionPool(host='localhost', port=6379, db=0)
 r_con = redis.Redis(connection_pool=pool)
@@ -69,13 +73,23 @@ if __name__ == "__main__":
 	print("=====inside main************")
 	data = Config.yamlconfig("config/config.yaml")
 	kafkahost=data[0]["kafka"]
+	tracker_smd = SharedMemoryDict(name="tracking", size=10000000)
+	tracker_smd.shm.close()
+	tracker_smd.shm.unlink()  # Free and release the shared memory block at the very end
+	del tracker_smd
 	with ProcessPoolExecutor(max_workers=2) as executor:
-		f1=executor.submit(process_queue,kafkahost)
-		print("f1====")
-		f2=executor.submit(run_uvicorn)
+		try:
+			f1=executor.submit(process_queue,kafkahost)
+			print("f1====")
+			f2=executor.submit(run_uvicorn)
 
-		f1.add_done_callback(future_callback_error_logger)
-		f2.add_done_callback(future_callback_error_logger)
+			f1.add_done_callback(future_callback_error_logger)
+			f2.add_done_callback(future_callback_error_logger)
+		except KeyboardInterrupt:
+			tracker_smd = SharedMemoryDict(name="tracking", size=10000000)
+			tracker_smd.shm.close()
+			tracker_smd.shm.unlink()  # Free and release the shared memory block at the very end
+			del tracker_smd
 	print("=====queue started===")
 
 	
