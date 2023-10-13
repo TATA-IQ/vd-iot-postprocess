@@ -54,11 +54,30 @@ class TemplateTracking():
         
         print("=========Length of detection",len(detection_output), len(list_det))
         if tracker_obj.tracks is  not None:
+            print("tracker.track objesct is not None")
+            try:
 
-            for trk,det in zip(tracker_obj.tracks,detection_output):
-                # print("======inside tracker=====")
-                # print("===>",trk.__dir__())
-                det["id"]=trk.track_id
+                for trk,det in zip(tracker_obj.tracks,detection_output):
+                    print("======inside tracker=====")
+                    # print("===>",trk.__dir__())
+                    det["id"]=trk.track_id
+                    detections.append(det)
+            except Exception as ex:
+                print("Exception tracking ===>",ex)
+                for det in detection_output:
+                    det["id"]=None
+                    detections.append(det)
+
+            self.tracking_save(tracker_obj)
+        else:
+
+            print("tracker.track objesct is None")
+            for det in detection_output:
+                det["id"]=None
                 detections.append(det)
             self.tracking_save(tracker_obj)
-        return detections
+        if len(detections)>0:
+
+            return detections
+        else:
+            return detection_output

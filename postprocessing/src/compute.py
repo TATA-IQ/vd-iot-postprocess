@@ -6,7 +6,7 @@ class Computation():
         self.steps=steps
         self.frame=frame
     
-    def count(self):
+    def count_crowd(self):
         misc=[]
         dictres={}
         print("======self.detection======")
@@ -33,6 +33,7 @@ class Computation():
             else:
                 self.detection_output["misc"]=misc
         
+        return self.detection_output
                 
     
     def brightness(self):
@@ -51,22 +52,24 @@ class Computation():
     def svd(self):
         pass
 
-    def ddp_computation(self,detecton):
+    def ddp_computation(self):
         misc=[]
-        dictres={}
+        
         print("======self.detection======")
         print(self.detection_output)
         if "prediction_class" in self.detection_output:
             for i in self.detection_output["prediction_class"]:
+                dictres={}
                 print("=======i======",i)
-                dictres["overlap"]=overlap
+                dictres[i["class_name"]]=i[i["class_name"]]
                 dictres["id"]=i["id"]
-            
-            for k,v in dictres.items():
-                tempdict={}
-                tempdict[k]=v
+                misc.append(dictres)
+            # tempdict={}
                 
-                misc.append(tempdict)
+            # for k,v in dictres.items():
+            #     tempdict[k]=v
+                
+                
             
             if "misc" in self.detection_output:
                 

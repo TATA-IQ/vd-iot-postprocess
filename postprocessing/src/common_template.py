@@ -44,13 +44,15 @@ class Template(Model,DetectionProcess,Computation):
                 
 
         
-    def detection_init(self):
-        DetectionProcess.__init__(self,self.detected_class,self.expected_class, self.image_time)
+    def detection_init(self,detected_class,expected_class,image_time):
+        DetectionProcess.__init__(self,detected_class,expected_class,image_time)
 
     def process_steps(self):
         #print("=====template step proces=====")
         steps_keys=list(map(lambda x: int(x),list(self.steps.keys())))
         steps_keys.sort()
+        filtered_output=[]
+        final_prediction={}
         #print("========steps keys extracted=====")
         for ki in steps_keys:
             
@@ -63,17 +65,18 @@ class Template(Model,DetectionProcess,Computation):
                 self.model_call(step)
                 #print("====inside step model===")
                 if len(self.detected_class)>0:
-                    self.detection_init()
+                    print("=====calling init=======")
+                    self.detection_init(self.detected_class,self.expected_class,self.image_time)
                     
                     filtered_res=self.process_detection()
-                    self.filtered_output.extend(filtered_res)
-                    self.final_prediction["prediction_class"]=self.filtered_output
+                    filtered_output.extend(filtered_res)
+                    final_prediction["prediction_class"]=self.filtered_output
 
             else:
-                Computation.__init__(self,self.final_prediction,step,self.frame)
-                self.final_prediction=self.process_computation()
+                Computation.__init__(self,final_prediction,step,self.frame)
+                final_prediction=self.process_computation()
                 
-        return self.final_prediction
+        return final_prediction
 
 
 

@@ -8,6 +8,7 @@ from threading import Lock
 from src.cache import Caching
 # svd_smd = SharedMemoryDict(name='svd', size=10000000)
 from datetime import datetime
+from src.number_plate_template import NumberPlateTemplate
 
 class SVDTemplate(Template,Caching):
     def __init__(self,image,image_name,camera_id,image_time,steps,frame,incidents,usecase_id,tracker=None,rcon=None):
@@ -22,7 +23,7 @@ class SVDTemplate(Template,Caching):
         self.rcon=rcon
         self.image_time=image_time
         self.cache_data=None
-        self.y_l1, self.y_l2 = 177, 280
+        self.y_l1, self.y_l2 = 800 ,1000#800 ,1000#920 ,1200#412, 670
         Template.__init__(self,image,image_name,camera_id,image_time,steps,frame)
         if self.rcon is not None:
             print("=======cahching initialization=====")
@@ -41,19 +42,15 @@ class SVDTemplate(Template,Caching):
 
     def speed_cal(self, T1, T2, T3):
         print("======Calling Speed Calculation======")
-        if T1 is None:
-            T1=datetime.strptime(T1,"%Y-%m-%d %H:%M:%S.%f")
-        if T2 is None:
-            T2=datetime.strptime(T2,"%Y-%m-%d %H:%M:%S.%f")
-        if T3 is None:
-            T3=datetime.strptime(T3,"%Y-%m-%d %H:%M:%S.%f")
-        time_diff_1 = T2 - T1
-        time_diff_2 = T3 - T2
+        T1, T2, T3 = float(T1), float(T2), float(T3)
+        time_diff_1 = float(T2 - T1)
+        time_diff_2 = float(T3 - T2)
         time_diff = time_diff_1 + time_diff_2
         if time_diff != 0:
             distance = 20  # meters
             speed_res = distance / time_diff
             speed_res = round(speed_res * 3.6, 2)
+            print('speed :', speed_res)
         return speed_res
             
     def line(self, frame,frame_width,frame_height):
@@ -75,13 +72,6 @@ class SVDTemplate(Template,Caching):
         frame=self.draw_line(frame,frame_width,list_lines)
         return frame,list_lines
             
-    def intersecting_lines_down(self, obj_id,vehicle_ymax,line_list,image):
-        # print('time dict :', cachedict["time_dict"][str(obj_id)])
-        temp_line_list=list(reversed(line_list[1:-1]))
-        for idx,li in enumerate(temp_line_list):
-            if vehicle_ymax<=li[1]:
-                cachedict["time_dict"][str(obj_id)]["time"]['t'+str(idx+2)]=self.image_time
-                cachedict["time_dict"][str(obj_id)]["vehicle_coords"].append([cachedict["time_dict"][str(obj_id)]["coords"]["xmin"],cachedict["time_dict"][str(obj_id)]["coords"]["ymin"],cachedict["time_dict"][str(obj_id)]["coords"]["xmax"],cachedict["time_dict"][str(obj_id)]["coords"]["ymax"]])
                         
     def check_up_down(self, line1_y1, line2_y1, y2):
         d1 = abs(line1_y1 - y2)
@@ -91,49 +81,68 @@ class SVDTemplate(Template,Caching):
             return "up"
         elif k == d2:
             return "down"
-    def intersecting_lines_up(self, obj_id,vehicle_ymax,line_list):
-        temp_line_list=line_list[1:-1]
-        for idx,li in enumerate(temp_line_list):
-            if vehicle_ymax<=li[1]:
-                cachedict["time_dict"][str(obj_id)]["time"]['t'+str(idx+2)]=self.image_time
-                cachedict["time_dict"][str(obj_id)]["vehicle_coords"].append([cachedict["time_dict"][str(obj_id)]["coords"]["xmin"],cachedict["time_dict"][str(obj_id)]["coords"]["ymin"],cachedict["time_dict"][str(obj_id)]["coords"]["xmax"],cachedict["time_dict"][str(obj_id)]["coords"]["ymax"]])
-
+    
     
     def process_steps(self):
         print("=====template step proces=====")
         steps_keys=list(map(lambda x: int(x),list(self.steps.keys())))
         steps_keys.sort()
-        print("========steps keys extracted=====")
+        print("========steps keys extracted=====")  
         for ki in steps_keys:
             if ki==1:
                 step=self.steps[str(ki)]
-
-                if step["step_type"]=="model":
-                    
-                    
+                print('==========')
+                step["model_url"] = "http://172.16.0.204:6500/detect"
+                print('model url:', step["model_url"])
+                if step["step_type"]=="model" and int(step["model_id"]) == 1:              
+                    # print('====list of exp classes :', list(step["classes"].values()))
                     self.expected_class.extend(list(step["classes"].values()))
                     print("=======inside model===")
                     self.model_call(step)
-                    #print("====inside step model===")
-                    print("=====deected class===")
-                    print(self.detected_class)
-
+                    # print("====inside step model===")
+                    # print("=====detected class===")
+                    # print(self.detected_class)
+                    # print('====len of detection :', len(self.detected_class))
                     if len(self.detected_class)>0:
-                        self.detection_init()
+                        self.detection_init(self.detected_class,self.expected_class, self.image_time)
                         #DetectionProcess.__init__(self,self.detected_class,self.expected_class)
                         filtered_res=self.process_detection()
+                        # print('====filter res :', filtered_res)
                         self.filtered_output.extend(filtered_res)
                         print("=====pred class==")
                         self.final_prediction["prediction_class"]=self.filtered_output
+                        # print('==final pred :', self.final_prediction)
             return self.final_prediction
-    
+        
+    def np_plate_calc(self, vehicle_detection , numberplate_detection):
+        print('====inside np plate calc=====')
+        print('=========getting prediction========')
+        vehicle_detection = vehicle_detection
+        print('=====vehcile detection====')
+        # print(vehicle_detection)
+        numberplate_detection = numberplate_detection  
+        print('=====np detection=======')
+        # print(numberplate_detection)
+        print("=====filteration of np and vehicle done======")
+        print("length of number plate===>",len(numberplate_detection))
+        print("length of vehicle===>",len(vehicle_detection))
+        if len(numberplate_detection)>0:
+            print("#"*50)
+            np_plate = NumberPlateTemplate(self.frame,self.usecase_id,self.camera_id,self.image_time)
+            np_plate=np_plate.process_np(vehicle_detection,numberplate_detection,self.steps)
+            print('predicted np plate=========')
+            print(np_plate)
+            print("%"*50)
+       
+
     def process_data(self):
         print("==============SVD==========")
         filtered_res_dict=[]
         self.process_steps()
         if "prediction_class" in self.final_prediction:
-            filtered_res_dict=self.final_prediction["prediction_class"]
-        
+            filtered_res_dict=self.final_prediction["prediction_class"]      
+        # print('========tracker :', self.tracker)
+        # print('========filter res :', filtered_res_dict)
         if self.tracker is not None:
             filtered_res_dict=self.tracker.track(self.image,filtered_res_dict)
         #=========check for up or down========
@@ -141,15 +150,19 @@ class SVDTemplate(Template,Caching):
 
         if len(filtered_res_dict)>0:
             print("=======going for svd======")
+            np_image = "output/"+self.image_name
             frame,detectlist=self.svd_calculation(filtered_res_dict)
-            print("=======speed======")
-            print(detectlist)
+            # print("=======speed======")
+            # print(detectlist)
+            np_image = "output/"+self.image_name
             cv2.imwrite("output/"+self.image_name,frame)
         cv2.imwrite("input/"+self.image_name,self.frame)
+        
         #TemplateTracking()
         # print("=========incident dict======")
         # print(incident_dict)
         # return filtered_res_dict, incident_dict
+
     def initialize_cache(self):
         print("=====start caching initialization=====")
         cachedict={}
@@ -225,125 +238,147 @@ class SVDTemplate(Template,Caching):
     def svd_calculation(self,filtered_res_dict):
         print("======call for svd=========")
         speed=0
-        trackids=[i["id"] for i in filtered_res_dict]
-        classidlist=[i["class_id"] for i in filtered_res_dict]
-        classnamelist=[i["class_id"] for i in filtered_res_dict]
-        detectlist=[i for i in filtered_res_dict]  
+        trackids= [i["id"] for i in filtered_res_dict if i["class_name"]== "car"] 
+        classidlist=[i["class_id"] for i in filtered_res_dict if i["class_name"]== "car"]
+        classnamelist=[i["class_id"] for i in filtered_res_dict if i["class_name"]== "car"]
+        detectlist=[i for i in filtered_res_dict if i["class_name"]== "car"] 
+        nplist = [i for i in filtered_res_dict if i["class_name"]== "numberplate"]
+        print('======detection list======')
+        # print(detectlist)
         detection_speed_list=None 
         vehicle_speed=0
         h,w,c=self.frame.shape
-
         frame,line_list=self.line(self.frame,w,h)
         id_list=[]
-        
         cachedict=self.getbykey("svd",self.camera_id,self.usecase_id,)
-        
         if cachedict is  None:
-            self.initialize_cache()
-            
+            self.initialize_cache()      
         else:
-            
             cachedict=self.getbykey("svd",self.camera_id,self.usecase_id)
-            
             cachedict["detections"].extend(filtered_res_dict)
-            
-            
-            
             print("=====cachedict====")
-           
             for idx,id_ in enumerate(trackids):
                 print("====idx checking====")
                 if id_ in cachedict["unique_id"]:
                     id_list.append([id_,(detectlist[idx]['xmin'],detectlist[idx]['ymin'],detectlist[idx]['xmax'],detectlist[idx]['ymax'])])
                     #check for pixel displacement
-                    speed=self.pixel_displacement(cachedict["detections"],id_)
-                    print("======updatig speed list====")
-                    if detection_speed_list is None:
-                        detection_speed_list=self.update_speed(detectlist,id_,speed)
-                    else:
-                        detection_speed_list=self.update_speed(detection_speed_list,id_,speed)
-                    print("======speed list updated====")
+                    # speed=self.pixel_displacement(cachedict["detections"],id_)
+                    # print("======updatig speed list====")
+                    # if detection_speed_list is None:
+                    #     detection_speed_list=self.update_speed(detectlist,id_,speed)
+                    # else:
+                    #     detection_speed_list=self.update_speed(detection_speed_list,id_,speed)
+                    # print("======speed list updated====")
                 
 
-                elif classnamelist[idx].lower()!="np" or  classnamelist[idx].lower()!="numberplate": #all classe by default except numberplate
+                elif classnamelist[idx].lower() =="np" or  classnamelist[idx].lower()!="numberplate": #all classe by default except numberplate
                     print("===executing elif")
                     cachedict["unique_id"].append(id_)
                     print("=====checking firction====")
-
                     detectlist[idx]["direction"]=self.check_up_down(line_list[0][1],line_list[2][1],detectlist[idx]["ymax"])
                     print("===updating state===")
                     detectlist[idx]["state"]=False
                     print("====updating unique direction===")
-
+                    # print('detection list:', detectlist[idx])
                     cachedict["unique_id_direction"].append([id_,detectlist[idx]])
                     print("======checking time dict====")
                     if id_ not in cachedict["time_dict"]:
-                        cachedict["time_dict"][str(id_)]={'t1': None, 't2': None,  't3':None, 'x1': None,'y1': None,'x2': None,'y2': None, 'speed': None, 'dir': None}
-                print("======fetchig det===",idx)
-                det = detectlist[idx]
+                        cachedict["time_dict"][str(id_)]={'t1': None, 't2': None,  't3':None, 'class':None,'x1': None,'y1': None,'x2': None,'y2': None, 'speed': None, 'dir': None, 'numberplate_dict':{}}
+                    # print('chache_dict========')
+                    # print(cachedict["time_dict"])
+                # print("======fetchig det===",idx)
+                # det = detectlist[idx]
                 print("====Got Det====")
                 if len(cachedict["unique_id_direction"])>0:
-                    objects_to_remove=[]
-                    print("====object to remove===")
-                    for j in range(0, len(cachedict["unique_id_direction"])):
-                            #print("====checking for down====",j)
-                            print(cachedict["unique_id_direction"][j][1])
+                    for j in range(0, len(cachedict["unique_id_direction"])):    
                             if cachedict["unique_id_direction"][j][0] in trackids and cachedict["unique_id_direction"][j][1]["direction"]=="down":
-                                print("=====condition check===")
+                                # print("====checking for down====",j)
+                                # print(cachedict["unique_id_direction"][j][1])
+                                # print("=====condition check===")
                                 obj_id = cachedict["unique_id_direction"][j][0]
-                                print("===geting object id====")
+                                class_name = cachedict["unique_id_direction"][j][1]['class_name']
+                                dir_down = cachedict["unique_id_direction"][j][1]['direction']
+                                # print("===geting object id====")
                                 for id_ , box_ in id_list:
                                     if id_==obj_id:
                                         print("====Box checking====")
                                         cachedict["time_dict"][str(obj_id)]['x1'],cachedict["time_dict"][str(obj_id)]['y1'],cachedict["time_dict"][str(obj_id)]['x2'],cachedict["time_dict"][str(obj_id)]['y2'] = box_
-                                print("=====Box checking done=====")
+                                # print("=====Box checking done=====")
                                 if cachedict["time_dict"][str(obj_id)]['y2'] is not None and cachedict["time_dict"][str(obj_id)]['y2']<=line_list[2][1]:
                                     if cachedict["time_dict"][str(obj_id)]['t1'] is None:
-                                        cachedict["time_dict"][str(obj_id)]['t1']=str(self.image_time)                       
+                                        cachedict["time_dict"][str(obj_id)]['t1']=str(self.image_time)
+                                        vehicle_detectdown = [i for i in filtered_res_dict if i["class_name"]== "car"] 
+                                        nplist = [i for i in filtered_res_dict if i["class_name"]== "numberplate"]
+                                    if cachedict["time_dict"][str(obj_id)]['class'] is None:
+                                            cachedict["time_dict"][str(obj_id)]['class'] = class_name
+                                    if cachedict["time_dict"][str(obj_id)]['dir'] is None:
+                                        cachedict["time_dict"][str(obj_id)]['dir'] = dir_down                        
                                     if cachedict["time_dict"][str(obj_id)]['y2'] > line_list[1][1]:
                                         if cachedict["time_dict"][str(obj_id)]['t2'] is None:
                                             cachedict["time_dict"][str(obj_id)]['t2'] = str(self.image_time)
                                     if cachedict["time_dict"][str(obj_id)]['y2'] > line_list[0][1]:
                                         if cachedict["time_dict"][str(obj_id)]['t3'] is None:
                                             cachedict["time_dict"][str(obj_id)]['t3'] = str(self.image_time)
-                                if cachedict["time_dict"][str(obj_id)]['t1'] is not None and cachedict["time_dict"][str(obj_id)]['t2'] is not None and cachedict["time_dict"][str(obj_id)]['t3'] is not None:
+                                    # print('time dict down :', cachedict["time_dict"])
+                                if cachedict["time_dict"][str(obj_id)]['t1'] is not None and cachedict["time_dict"][str(obj_id)]['t2'] is not None and cachedict["time_dict"][str(obj_id)]['t3'] is not None and cachedict["time_dict"][str(obj_id)]['class'] == 'car':
                                     try:    
-                                        print('::::::processing for down ids:::::')
+                                        print('::::::processing for up ids:::::')
                                         vehicle_speed = self.speed_cal(cachedict["time_dict"][str(obj_id)]['t1'], cachedict["time_dict"][str(obj_id)]['t2'], cachedict["time_dict"][str(obj_id)]['t3'])
                                         print('speed ::',vehicle_speed)
                                         cachedict["time_dict"][str(obj_id)]['speed'] = vehicle_speed
+                                        if cachedict["time_dict"][str(obj_id)]['speed'] > 2:
+                                            print('=====calling np func======')
+                                            vehicle_detection = [i for i in filtered_res_dict if i["id"]== obj_id]
+                                            self.np_plate_calc(vehicle_detectdown,nplist)
+                                            
                                         print("Object ID:", obj_id, "Speed:", vehicle_speed, 'kmph')
                                         print('time dict up :', cachedict["time_dict"])
                                         detectlist[idx]["speed"]=vehicle_speed
                                     except:
                                         pass
-                            #print("=======checking for up====",j)
-                            print(cachedict["unique_id_direction"][j][1])
+                            
                             if cachedict["unique_id_direction"][j][0] in trackids and cachedict["unique_id_direction"][j][1]["direction"]=="up":
+                                # print("=======checking for up====",j)
+                                # print(cachedict["unique_id_direction"][j][1])
                                 obj_id = cachedict["unique_id_direction"][j][0]
+                                class_name = cachedict["unique_id_direction"][j][1]['class_name']
+                                dir_up = cachedict["unique_id_direction"][j][1]['direction']
                                 print("======obj id got=====")
                                 for id_ , box_ in id_list:
                                     if id_==obj_id:
                                         print("===checking time dict====")
                                         cachedict["time_dict"][str(obj_id)]['x1'],cachedict["time_dict"][str(obj_id)]['y1'],cachedict["time_dict"][str(obj_id)]['x2'],cachedict["time_dict"][str(obj_id)]['y2'] = box_
                                 # print('id:',obj_id, 'y2 :', cachedict["time_dict"][str(obj_id)]['y2'], 'line1:', line_list[0][1], 'line2:', line_list[1][1], 'line3:', line_list[2][1])
+                                
                                 if cachedict["time_dict"][str(obj_id)]['y2'] is not None and cachedict["time_dict"][str(obj_id)]['y2']>=line_list[0][1]:
                                     print("====time checking")
                                     if cachedict["time_dict"][str(obj_id)]['t1'] is None:
-                                        cachedict["time_dict"][str(obj_id)]['t1']=str(self.image_time    )                   
+                                        cachedict["time_dict"][str(obj_id)]['t1']=str(self.image_time)
+                                        if cachedict["time_dict"][str(obj_id)]['class'] is None:
+                                            cachedict["time_dict"][str(obj_id)]['class'] = class_name
+                                        if cachedict["time_dict"][str(obj_id)]['dir'] is None:
+                                            cachedict["time_dict"][str(obj_id)]['dir'] = dir_up                 
                                     if cachedict["time_dict"][str(obj_id)]['y2'] > line_list[1][1]:
                                         if cachedict["time_dict"][str(obj_id)]['t2'] is None:
                                             cachedict["time_dict"][str(obj_id)]['t2'] = str(self.image_time)
+                                    # print('y2 :', cachedict["time_dict"][str(obj_id)]['y2'], 'line2:{}, line3:{}'.format(line_list[1][1], line_list[2][1]))
                                     if cachedict["time_dict"][str(obj_id)]['y2'] > line_list[2][1]:
                                         if cachedict["time_dict"][str(obj_id)]['t3'] is None:
+                                            # print('y2 :', cachedict["time_dict"][str(obj_id)]['y2'], 'line3:{}'.format(line_list[2][1]))
                                             cachedict["time_dict"][str(obj_id)]['t3'] = str(self.image_time)
-                                    # print('time dict up :', cachedict["time_dict"])
-                                if cachedict["time_dict"][str(obj_id)]['t1'] is not None and cachedict["time_dict"][str(obj_id)]['t2'] is not None and cachedict["time_dict"][str(obj_id)]['t3'] is not None:
+                                    print('====time dict up=======')
+                                    print(cachedict["time_dict"])
+                                if cachedict["time_dict"][str(obj_id)]['t1'] is not None and cachedict["time_dict"][str(obj_id)]['t2'] is not None and cachedict["time_dict"][str(obj_id)]['t3'] is not None and cachedict["time_dict"][str(obj_id)]['class'] == 'car':
                                     try:    
-                                        print('::::::processing for down ids:::::')
+                                        print('::::::processing for up ids:::::')
                                         vehicle_speed = self.speed_cal(cachedict["time_dict"][str(obj_id)]['t1'], cachedict["time_dict"][str(obj_id)]['t2'], cachedict["time_dict"][str(obj_id)]['t3'])
                                         print('speed ::',vehicle_speed)
                                         cachedict["time_dict"][str(obj_id)]['speed'] = vehicle_speed
+                                        if cachedict["time_dict"][str(obj_id)]['speed'] > 2:
+                                            print('=====calling np func======')
+                                            vehicle_detection = [i for i in filtered_res_dict if i["id"]== obj_id]
+                                            self.np_plate_calc(vehicle_detection,nplist)
+                                            
                                         print("Object ID:", obj_id, "Speed:", vehicle_speed, 'kmph')
                                         print('time dict up :', cachedict["time_dict"])
                                         detectlist[idx]["speed"]=vehicle_speed

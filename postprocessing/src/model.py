@@ -11,6 +11,8 @@ class Model():
             
             # time_diff=(current_time-self.image_time).total_seconds()
             # self.logger.info(f"{self.usecase_id}, {self.camera_id}, model response time, {time_diff}")
+            print("=====model result=====")
+            print(response.json())
             return response
         except Exception as ex:
             print("=====url======",self.url)

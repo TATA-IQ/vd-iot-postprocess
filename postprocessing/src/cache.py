@@ -8,7 +8,7 @@ class Caching():
     
     def setbykey(self,key,camera_id, usecase_id,data):
         try:
-            
+            print("=====cache storing===")
             self.rcon.set(key+"_"+str(camera_id)+"_"+str(usecase_id),json.dumps(data))
         except Exception as ex:
             print("exception while saving: ",ex)

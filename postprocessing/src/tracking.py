@@ -1,5 +1,5 @@
 from deep_sort.deep_sort.tracker import Tracker as DeepSortTracker
-from deep_sort.tools.generate_detections import Encoding
+# from deep_sort.tools.generate_detections import Encoding
 from deep_sort.deep_sort import nn_matching
 from deep_sort.deep_sort.detection import Detection
 import numpy as np
@@ -19,12 +19,12 @@ class Tracker:
         metric = nn_matching.NearestNeighborDistanceMetric("cosine", max_cosine_distance, nn_budget)
         self.tracker = DeepSortTracker(metric)
     
-    def update_encoder(self,encoder=None):
+    # def update_encoder(self,encoder=None):
 
-        self.encoder = Encoding(encoder, batch_size=8)
+    #     self.encoder = Encoding(encoder, batch_size=8)
     
-    def delete_encoder(self):
-        self.encoder=None
+    # def delete_encoder(self):
+    #     self.encoder=None
 
     def update(self,usecase_id,cameraid, grpcclient,frame, detections):
 

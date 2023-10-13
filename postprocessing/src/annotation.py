@@ -22,8 +22,12 @@ class AnnotateImage():
         start_pixel_h=30
         class_ids=[i["class_id"] for i in self.expected_class ]
         start_pixel_w=pixeldiff_w-int(0.2*w)+10
+        track_name_list=[]
+        np_list=[]
         for det in self.detected_class:
-            print("===annot detect===",annot)
+            
+
+            print("===annot detect===")
             try:
                 class_id=det["class_id"]
             except:
@@ -41,44 +45,61 @@ class AnnotateImage():
         return frame
 
     def internal_legend(self,frame):
-        
+        print("====internal legend=======")
         FONT_SCALE = 0.5
         try:
+            print("====class id====")
             class_ids=[i["class_id"] for i in self.expected_class ]
-        
+            print("=======det====")
+            print(self.detected_class)
             for det in self.detected_class:
+                print(det)
                 x1 = det["xmin"]
                 y1 = det["ymin"]
                 x2 = det["xmax"]
                 y2 = det["ymax"]
                 class_name = det["class_name"]
-                width =x2 - x1
-                height = y2 - y1
+                print("=*********")
+                width =int(x2) - int(x1)
+                height = int(y2) - int(y1)
                 class_id=det["class_id"]
-                
+                print("=======expected====")
                 expected_class=self.expected_class[class_id.index(str(class_id))]
                 
                 #overlap = output[i]["overlap"]
-                #print("=======annotation====")
+                print("=======annotation====")
                 frame=cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), color=ImageColor.getcolor(expected_class["bound_color"],"RGB"), thickness=expected_class["text_thickness"])
                 # cv2.rectangle(image, (int(x1), int(y1)), (int(x1)+(int(x2) - int(x1)), int(y1) - 10), color=color_code[class_name],
                 #             thickness=-1)
-                #print("=====text========")
+                print("=====text========")
                 frame=cv2.putText(frame, class_name, (int(x1), int(y1)), cv2.FONT_HERSHEY_SIMPLEX, min(width, height) * FONT_SCALE*10, color=ImageColor.getcolor(expected_class["bound_color"],"RGB"), thickness=expected_class["bound_thickness"])
                 cv2.imwrite("annot_frame/"+str(datetime.utcnow())+".jpg",frame)
         except Exception as ex:
             print("Exception while annotation===>",ex)
         return frame
 
+    
+    
+    def annotate_computation(self):
+        misc=self.detection_output["misc"]
+        pass
+        
 
     
     def annotate(self,legend_state=0):
+        print("====annotation called===")
         frame=np.copy(self.frame)
         
         #h,w,c=frame.shape
-        if int(legend_state)==1:
-            frame=self.external_legend(frame)
-        else:
+        try:
+            if int(legend_state)==1:
+                print("====exter legend====")
+                frame=self.external_legend(frame)
+            else:
+                print("====internal legend====")
+                frame=self.internal_legend(frame)
+        except:
+            print("====internal legend exceptions====")
             frame=self.internal_legend(frame)
         return frame
         

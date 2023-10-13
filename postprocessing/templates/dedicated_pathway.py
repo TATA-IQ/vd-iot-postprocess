@@ -1,14 +1,20 @@
 from src.common_template import Template
 from src.incidents import IncidentExtract
-from src.postprocessing_template import 
+from src.postprocessing_template import PostProcessing
+from src.cache import Caching
+from src.compute import Computation
 class DedicatedPathway(Template,Caching,IncidentExtract,PostProcessing):
-    def __init__(self,image,image_name,camera_id,image_time,steps,frame,incidents,usecase_id,tracker=None,rcon=None):
-        print("====Initializing crowd=====")
-        self.frame=image
+    def __init__(self,image,image_name,camera_id,image_time,steps,frame,incidents,usecase_id,tracker=None,rcon=None,mask=None,image_back=None):
+        print("====Initializing Pathway=====")
+        self.frame=frame
         self.allsteps=steps
         self.tracker=tracker
         self.incidents=incidents
-        
+        self.mask=mask
+        self.image_back=image_back
+        self.rcon=rcon
+        self.usecase_id=usecase_id
+        self.camea_id=camera_id
         Template.__init__(self,image,image_name,camera_id,image_time,steps,frame)
         if self.rcon is not None:
             print("=======cahching initialization=====")
@@ -18,12 +24,11 @@ class DedicatedPathway(Template,Caching,IncidentExtract,PostProcessing):
             
             if data is None:
                 self.initialize_cache()
+            
     def initialize_cache(self):
         
         cachedict={}
-        cachedict["unique_id"]=[]
-        
-        cachedict["image"]=""
+       
         cachedict["detections"]=[]
         print("======caching initialization done====")
         self.setbykey("ddp",self.camera_id,self.usecase_id,cachedict)
@@ -33,6 +38,9 @@ class DedicatedPathway(Template,Caching,IncidentExtract,PostProcessing):
             
 
     def process_steps(self):
+        masked_image=None
+        final_prediction={}
+        final_prediction["prediction_class"]=[]
         steps_keys=list(map(lambda x: int(x),list(self.steps.keys())))
         steps_keys.sort()
         #print("========steps keys extracted=====")
@@ -47,72 +55,79 @@ class DedicatedPathway(Template,Caching,IncidentExtract,PostProcessing):
                 self.model_call(step)
                 #print("====inside step model===")
                 if len(self.detected_class)>0:
-                    self.detection_init()
+                    self.detection_init(self.detected_class,self.expected_class,self.image_time)
                     
                     filtered_res=self.process_detection()
+                    if self.tracker is not None:
+                        filtered_res=self.tracker.track(self.image,filtered_res)
                     self.filtered_output.extend(filtered_res)
-                    self.final_prediction["prediction_class"]=self.filtered_output
+                    print("=====length of detection===",len(filtered_res))
+                    final_prediction["prediction_class"]=self.filtered_output
                 if self.mask is not None:
-                    self.final_prediction["prediction_class"]=self.masked_detection(self.frame,self.mask, filtered_res_dict)
-
+                    final_prediction["prediction_class"],masked_image=self.masked_detection(self.mask,self.image_back, final_prediction["prediction_class"])
+                    print("=====masked perdiction=====")
+                    print(final_prediction["prediction_class"])
             if step["step_type"]=="computation":
-                Computation.__init__(self,self.final_prediction,step,self.frame)
-                 self.final_prediction=self.ddp_computation(self.final_prediction)
+                Computation.__init__(self,final_prediction,step,self.frame)
+                final_prediction=self.ddp_computation()
+        return final_prediction, masked_image
             
         
 
 
+    def set_cache(self,currentdata,cachedict):
+        if cachedict is not None:
+            if len(cachedict["detections"])>9:
+                print(len(cachedict))
+                for i in range(10,len(cachedict["detections"])):
+                    del cachedict["detections"][i]
 
+                
+                cachedict["detections"].insert(0,currentdata)
+            else:
+                cachedict["detections"].insert(0,currentdata)
+        else:
+            cachedict={}
+            cachedict["detections"]=[]
+            cachedict["detections"].insert(0,currentdata)
+        self.setbykey("ddp",self.camera_id,self.usecase_id,cachedict)
+    
 
 
     
     def process_data(self):
         print("==============Data==========")
         prexistdata=None
-        filtered_res_dict=self.process_steps()
+        filtered_res_dict={}
+        detection_incidentflag={}
+        filtered_res_dict, masked_image=self.process_steps()
+        
         print("====Process called=======")
         print(filtered_res_dict)
-        self.process_steps()
-        data=self.getbykey("ddp",self.usecase_id,self.camera_id)
-        if data is not None:
-            prexistdata=data
-            if len(data)>9:
-                data[0]=self.final_prediction
-            else:
-                data.append(self.final_prediction)
+        
+        detection_data=[]
+        incident_dict=[]
+        cachedict=self.getbykey("ddp",self.camera_id,self.usecase_id)
+        print("=====cachedict====")
+        # print(cachedict)
+        if cachedict is None or len(cachedict)==0:
+            pass
         else:
-            data=[self.final_prediction]
-        self.setbykey("ddp",self.usecase_id,self.camera_id,data)
-        IncidentExtract.__init__(self,self.final_prediction,self.incident,self.steps)
-        
-        #prepare the data to save
-        # if prexistdata is not None:
-        #     PostProcessing(self.final_prediction,prexistdata)
-        #     if self.tracker is not None:
-        #         common,uncommon=self.filter_data_by_id()
-        #     else:
-        #         common,uncommon=self.filter_data_by_overlap()
-        # self.final_prediction["prediction_class"]=uncommon
-        
-
-    
-            
-
-
-
-        
-
-        
-
-
-
-
-
-        IncidentExtract.__init__(self,filtered_res_dict,self.incidents,self.allsteps)
-        incident_dict=self.process_incident()
+            print("======postprocessing called======")
+            PostProcessing.__init__(self,filtered_res_dict,cachedict["detections"])
+            filtered_res_dict["prediction_class"],_=self.filter_data_detection()
+        print("=======filtering======")
+        if "prediction_class" in filtered_res_dict:
+            detection_data=filtered_res_dict["prediction_class"]
+            IncidentExtract.__init__(self,filtered_res_dict,self.incidents,self.allsteps)
+            incident_dict,detection_incidentflag["prediction_class"]=self.process_incident()
         print("=========incident dict======")
-        print(incident_dict)
-        return filtered_res_dict, incident_dict
+        print(len(incident_dict))
+        print("=======detection data====")
+        print(len(detection_data))
+        if len(filtered_res_dict["prediction_class"])>0:
+            self.set_cache(detection_incidentflag,cachedict)
+        return detection_data, incident_dict,self.expected_class, masked_image
 
 
 
