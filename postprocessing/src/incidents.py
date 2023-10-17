@@ -121,7 +121,7 @@ class IncidentExtract():
                                 self.incident_id=self.incident_id+1
                                 print("=====step====")
                                 print(step)
-                                incidentdict["misc"].append({step["computation_name"]:dtdata[dtdata["class_name"]]})
+                                incidentdict["misc"].append({"data":dtdata[dtdata["class_name"]],"text":step["computation_name"]})
                                 incidentlist.append(incidentdict)
                                 dictwithincidentflag.append(dtdata)
                     
@@ -130,7 +130,7 @@ class IncidentExtract():
                             incidentdict["misc"]=[]
                             dtdata["incident_status"]=True
                             self.incident_id=self.incident_id+1
-                            incidentdict["misc"].append({step["name"]:dtdata[dtdata["class_name"]]})
+                            incidentdict["misc"].append({"data":dtdata[dtdata["class_name"]],"text":step["name"]})
                             incidentlist.append(incidentdict)
                             dictwithincidentflag.append(dtdata)                    
                 else:
@@ -182,15 +182,15 @@ class IncidentExtract():
         print(self.misc)
         print(class_name)
         if class_name is None:
-            if self.misc is not None:
+            if self.misc is not None or len(self.misc)>0:
                 for i in self.misc:
-                    keyslist=list(i.keys())
-                    print("===keyslist===",keyslist)
-                    for ki in keyslist:
-                        val=i[ki]
-                        print("====val===",val,upper_limit,lower_limit)
-                        if val>=upper_limit or val<=lower_limit:
-                            incident_list.append({ki:val})
+                    val=i["data"]
+                    text=i["text"]
+                    if val>=upper_limit or val<=lower_limit:
+                        incident_list.append({"data":val,"text":text})
+                    
+                    
+                        
             if len(incident_list)>0:
 
                 return self.create_derived_incident(idx,incident_list ),detected_output
@@ -200,46 +200,11 @@ class IncidentExtract():
             incident_list,detected_output=self.base_incident_with_misc(step)
             return incident_list, detected_output
 
-            # print("====checking in else====")
-            # print(detected_output)
-            # if self.misc is not None:
-            #     for idxmisc,i in enumerate(self.misc):
-            #         keyslist=list(i.keys())
-            #         for ki in keyslist:
-            #             if ki==class_name:
-            #                 val=i[ki]
-            #                 if val>=upper_limit or val<=lower_limit:
-            #                     print("**********",idx)
-                                
-            #                     if "incident_status" in detected_output[idxmisc]:
-            #                         print("===not exist===")
-            #                         if detected_output[idxmisc]["incident_status"]:
-            #                             pass
-            #                         else:
-            #                             print("====exist===")
-            #                             detected_output[idxmisc]["incident_status"]=True
-            #                     else:
-            #                         print("====else====",idxmisc)
-            #                         print(detected_output[idxmisc])
-            #                         detected_output[idxmisc]["incident_status"]=True
-            #                         print("====done====")
-
-            #                     incident_list.append({ki:val})
-            #                 else:
-            #                     print("====else====")
-            #                     detected_output[idxmisc]["incident_status"]=False
-            #                     print("====done===")
-
 
             
 
 
-        # print("======Returning back====")
-        # print(incident_list)
-        # if len(incident_list)>0:
-        #     return self.create_derived_incident(idx,incident_list ),detected_output
-        # else:
-        #     return [], detected_output
+        
     
     def process_incident(self):
         incidentlist,detectin_incidentflag=[],[]

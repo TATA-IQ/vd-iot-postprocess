@@ -86,8 +86,62 @@ class CrowdTemplate(Template,PostProcessing,IncidentExtract,Caching):
                 print("======prediction after count=====")
                 print(final_prediction)
         return final_prediction, masked_image
-         
+    
+    def derived_incident(self,idx,step):
+        class_name=self.incident_class[idx]
+        icident_value=self.incident_values[idx]
+        detected_output=[]
+        print("====checking derived incidentt====")
+
+        if "prediction_class" in self.detection_output and  len(self.detection_output["prediction_class"])>0:
+            detected_output=self.detection_output["prediction_class"]
+
+        print("======derived incident====")
+
+        upper_limit=float(step["upper_limit"])
+        lower_limit=float(step["lower_limit"])
+        tolerance=float(step["tolerance"])
         
+        upper_limit=upper_limit+(upper_limit)*(tolerance/100)
+        lower_limit=lower_limit-(lower_limit)*(tolerance/100)
+        incident_list=[]
+        print("======self misc=====")
+        print(self.misc)
+        print(class_name)
+        
+        if self.misc is not None or len(self.misc)>0:
+            for i in self.misc:
+                val=i["data"]
+                text=i["text"]
+                if val>=upper_limit or val<=lower_limit:
+                    incident_list.append({"data":val,"text":text})
+                
+                
+                        
+        if len(incident_list)>0:
+
+            return self.create_derived_incident(idx,incident_list ),detected_output
+        else:
+            return [], detected_output
+    def process_incident(self):
+        incidentlist,detectin_incidentflag=[],[]
+        print("*******incident_type_id*******")
+        print(self.incident_type_id)
+        for idx,inc_id in enumerate(self.incident_type_id):
+            print("=======checking incident=======")
+            if int(inc_id)==2:
+                for st in self.derived_steps:
+                    tempderived_incident,detectin_incidentflag=self.derived_incident(idx,st)
+                    print("====incidebts====")
+                    print(tempderived_incident)
+                    if len(tempderived_incident)>0:
+                        incidentlist.extend(tempderived_incident)
+        print("=====Returning=====")
+        return incidentlist,detectin_incidentflag
+
+
+
+
     def process_data(self):
         detection_data=[]
         detection_incidentflag={}
@@ -117,11 +171,17 @@ class CrowdTemplate(Template,PostProcessing,IncidentExtract,Caching):
         print(incident_dict)
         print("=======detection data====")
         print(len(detection_data))
-        if len(detection_incidentflag)>0:
+        misc_data=None
+        if "misc" in filtered_res_dict:
+            if len(filtered_res_dict)>0:
+                misc_data=filtered_res_dict["misc"]
+
+
+        if len(detection_incidentflag["prediction_class"])>0:
             self.set_cache(detection_incidentflag,cachedict)
         print("=======Crowd Calculation Done=======")
         
-        return detection_data, incident_dict, self.expected_class, masked_image
+        return detection_data, incident_dict, self.expected_class, masked_image,misc_data
 
 
 

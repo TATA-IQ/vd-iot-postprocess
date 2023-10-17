@@ -22,7 +22,8 @@ class Computation():
             print(dictres)
             for k,v in dictres.items():
                 tempdict={}
-                tempdict[k]=v
+                tempdict["data"]=v
+                tempdict["text"]=k
                 misc.append(tempdict)
             print("====misc===")
             print(misc)
@@ -42,7 +43,7 @@ class Computation():
         
         brightness=np.mean(v)
         misc=[]
-        misc.append({"brightness":brightness})
+        misc.append({"data":brightness,"text":"brightness"})
         if "misc" in self.detection_output:
                 
                 self.detection_output["misc"].extend(misc)
@@ -61,8 +62,9 @@ class Computation():
             for i in self.detection_output["prediction_class"]:
                 dictres={}
                 print("=======i======",i)
-                dictres[i["class_name"]]=i[i["class_name"]]
-                dictres["id"]=i["id"]
+                dictres["data"]=i[i["class_name"]]
+                dictres["text"]="overlap"
+                #dictres["id"]=i["id"]
                 misc.append(dictres)
             # tempdict={}
                 

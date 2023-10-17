@@ -23,7 +23,7 @@ class SVDTemplate(Template,Caching):
         self.rcon=rcon
         self.image_time=image_time
         self.cache_data=None
-        self.y_l1, self.y_l2 = 800 ,1000#800 ,1000#920 ,1200#412, 670
+        self.y_l1, self.y_l2 = 177, 280 #800 ,1000#800 ,1000#920 ,1200#412, 670
         Template.__init__(self,image,image_name,camera_id,image_time,steps,frame)
         if self.rcon is not None:
             print("=======cahching initialization=====")
@@ -42,10 +42,20 @@ class SVDTemplate(Template,Caching):
 
     def speed_cal(self, T1, T2, T3):
         print("======Calling Speed Calculation======")
-        T1, T2, T3 = float(T1), float(T2), float(T3)
-        time_diff_1 = float(T2 - T1)
-        time_diff_2 = float(T3 - T2)
+        print(T1, T2, T3)
+        print(type(T1), type(T2), type(T3))
+        if T1 is not None:
+            T1=datetime.strptime(T1,"%Y-%m-%d %H:%M:%S.%f")
+        if T2 is not None:
+            T2=datetime.strptime(T2,"%Y-%m-%d %H:%M:%S.%f")
+        if T3 is not None:
+            T3=datetime.strptime(T3,"%Y-%m-%d %H:%M:%S.%f")
+        T1, T2, T3 = T1, T2, T3
+        print("====Aftr float convrsion======")
+        time_diff_1 = (T2 - T1).total_seconds()
+        time_diff_2 = (T3 - T2).total_seconds()
         time_diff = time_diff_1 + time_diff_2
+        print("=======Time diff======",time_diff)
         if time_diff != 0:
             distance = 20  # meters
             speed_res = distance / time_diff

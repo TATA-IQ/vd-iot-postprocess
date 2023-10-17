@@ -50,7 +50,12 @@ class BrightnessTemplate(Template,IncidentExtract,Caching):
         incident_dict,detected_output=self.process_incident()
         print("=========incident dict======")
         print(incident_dict)
-        return filtered_res_dict["misc"], incident_dict,self.expected_class, None
+        if "misc" in filtered_res_dict:
+            if len(filtered_res_dict)>0:
+                misc_data=filtered_res_dict["misc"]
+        print("=====filtered res dict Brightness====")
+        print(filtered_res_dict)
+        return None, incident_dict,self.expected_class, None,misc_data
 
 
 

@@ -107,11 +107,11 @@ class PostProcessingApp():
         return {"raw_image":image_str,"processed_image":image_str,"incident_event":self.metadata,"usecase":self.metadata["usecase"]}
 
 
-    def prepare_send(self,expected_class,detection_output,incident_out,masked_image):
+    def prepare_send(self,expected_class,detection_output,incident_out,masked_image,misc_data=None):
         if masked_image is not None:
-            annot=AnnotateImage(expected_class,detection_output,masked_image)
+            annot=AnnotateImage(expected_class,detection_output,masked_image,misc_data)
         else:
-            annot=AnnotateImage(expected_class,detection_output,self.frame)
+            annot=AnnotateImage(expected_class,detection_output,self.frame,misc_data)
         if len(detection_output)>0:
             print("if===>",len(detection_output))
             frame=annot.annotate(self.legend)
@@ -129,13 +129,15 @@ class PostProcessingApp():
         tracker=TemplateTracking(self.usecase_id,self.camera_id,self.grpcclient)
            
         ct=CrowdTemplate(self.image,self.image_name,self.camera_id,self.image_time,self.steps,self.frame,self.incidents,self.usecase_id,rcon=self.rcon)
-        detection_output,incident_out,expected_class, masked_image=ct.process_data()
-        self.prepare_send(expected_class,detection_output,incident_out,masked_image)
+        detection_output,incident_out,expected_class, masked_image,misc_data=ct.process_data()
+        print("%%%%%%%%%%%%%%%%%%%%%%%%")
+        print(detection_output)
+        self.prepare_send(expected_class,detection_output,incident_out,masked_image,misc_data)
     
     def anpr_detect(self,mask,image_back):
         tracker=TemplateTracking(self.usecase_id,self.camera_id,self.grpcclient)
         anpr=ANPRTemplate(self.image,self.image_name,self.camera_id,self.image_time,self.steps,self.frame,self.incidents,self.usecase_id,tracker,self.rcon)
-        detection_output,incident_out,expected_class, masked_frame=anpr.process_data()
+        detection_output,incident_out,expected_class, masked_image=anpr.process_data()
         self.prepare_send(expected_class,detection_output,incident_out,masked_image)
     def ppe_detect(self,mask,image_back):
         tracker=TemplateTracking(self.usecase_id,self.camera_id,self.grpcclient)
@@ -170,6 +172,10 @@ class PostProcessingApp():
         garb=GarbageTemplate(self.image,self.image_name,self.camera_id,self.image_time,self.steps,self.frame,self.incidents,self.usecase_id,tracker=tracker,rcon=self.rcon,mask=mask,image_back=image_back)
         detection_output,incident_out,expected_class, masked_image=garb.process_data()
         self.prepare_send(expected_class,detection_output,incident_out,image_back)
+    def brightness_detect(self, mask, image_back):
+        bt=BrightnessTemplate(self.image,self.image_name,self.camera_id,self.image_time,self.steps,self.frame,self.incidents,self.usecase_id,rcon=self.rcon)
+        detection_output,incident_out,expected_class, masked_image, misc_data=bt.process_data()
+        self.prepare_send(expected_class,detection_output,incident_out,image_back,misc_data)
 
 
 
@@ -188,17 +194,36 @@ class PostProcessingApp():
             print("=====processing mask=====")
             image_back,mask=mask.process_mask()
             print("=====processing masked=====")
+        # if self.usecase_template_id==1:
+        #     self.ppe_detect(mask,image_back)
+        # if self.usecase_template_id==3:
+        #     self.fire_smoke_detect(mask,image_back)
+        # if self.usecase_template_id==4:
+        #     self.crowd_counting(mask,image_back)
+        # if self.usecase_template_id==7:
+        #     self.garbage_detect(mask,image_back)
+        # if self.usecase_template_id==8:
+        #     self.brightness_detect(mask,image_back)
+        # if self.usecase_template_id==9:
+        #     self.dedicated_pathway(mask,image_back)
+        # if self.usecase_template_id==10:
+        #     self.anpr_detect(mask,image_back)
+
         # bt=BrightnessTemplate(self.image,self.image_name,self.camera_id,self.image_time,self.steps,self.frame,self.incidents,self.usecase_id,rcon=self.rcon)
-        # detection_output,incident_out,expected_class, masked_image=bt.process_data()
+        # detection_output,incident_out,expected_class, masked_image, misc_data=bt.process_data()
         # print(detection_output)
         #self.crowd_counting(mask,image_back)
         # if int(self.usecase_template_id)==9:
         #     self.dedicated_pathway(mask,image_back)
         # if int(self.usecase_template_id)==1:
         #     self.ppe_detect(mask,image_back)
+        # tracker=TemplateTracking(self.usecase_id,self.camera_id,self.grpcclient)
         tracker=TemplateTracking(self.usecase_id,self.camera_id,self.grpcclient)
         svd=SVDTemplate(self.image,self.image_name,self.camera_id,self.image_time,self.steps,self.frame,self.incidents,self.usecase_id,tracker,rcon=self.rcon)
         svd.process_data()
+        
+        # print("=======crowd======")
+        # self.crowd_counting(mask,image_back)
 
 
         
@@ -214,12 +239,12 @@ class PostProcessingApp():
         # if ( int(self.camera_id)==6) and int(self.usecase_id)==4:
         #     self.call_template()
         # for steps in list(self.steps.values()):
-        #     self.model_meta.append({"model_url":steps["model_url"],"model_type":steps["model_type"],"model_framework":steps["model_framework"],"model_id":steps["model_id"]})
+        #     self.model_meta.append({"model_url":steps["modqel_url"],"model_type":steps["model_type"],"model_framework":steps["model_framework"],"model_id":steps["model_id"]})
         #     #self.process_step_model.append(steps["model_url"],steps["classes"],steps["model_type"],steps["model_framework"])
         # self.call_template()
-        if  int(self.camera_id)==3 and int(self.usecase_template_id)==9:
-            print(self.usecase_id)
-            self.call_template()
+        # if  int(self.camera_id)==3 and int(self.usecase_template_id)==2:
+        #     print(self.usecase_id)
+        self.call_template()
 
     
 

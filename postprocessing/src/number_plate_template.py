@@ -42,7 +42,7 @@ class NumberPlateTemplate():
         image_str=cv2.imencode(".jpg", self.frame)[1].tobytes().decode("ISO-8859-1")
         requestparams=self.create_request_np(image_str,npcords,step["model_type"],step["model_framework"])
         print("====calling api=====")
-        response=self.api_call_np("http://172.16.0.178:6504/detect",requestparams)
+        response=self.api_call_np(url,requestparams)
         if response is not None and response.status_code==200:
             data=response.json()["data"]
             return data
@@ -90,7 +90,7 @@ class NumberPlateTemplate():
             print(stp)
             print(step_process)
 
-            if int(stp)==2:
+            if step_process["model_type"].lower()=="ocr":
                 print("====going for np detectction====",len(np_detection))
                 print(np_detection)
                 for ix,det in enumerate(np_detection):

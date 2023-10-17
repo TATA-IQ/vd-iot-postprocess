@@ -45,6 +45,19 @@ class PostProcessing():
         print("Length of common dict===>",len(commondict))
         print("Length of uncommon dict===>",len(uncommondict))
         return uncommondict, commondict
+    def filter_misc_incident(self,prev_misc_data,current_misc_data):
+        misc_data=[]
+        prev_data=[]
+        _=[prev_data.extend(i["misc"]) in prev_misc_data]
+        for cmd in current_misc_data:
+            for pmd in prev_data:
+                if cmd["text"]==pmd["text"]:
+                    if cmd["data"]==pmd["data"]:
+                        break;
+            misc_data.append(cmd)
+        return misc_data
+
+
     
     # def filter_data_comp(self):
     #     current_detection=[i for i in self.current_detection["misc"]]
