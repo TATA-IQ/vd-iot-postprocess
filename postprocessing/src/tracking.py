@@ -37,17 +37,17 @@ class Tracker:
         bboxes = np.asarray([d[:-1] for d in detections])
         bboxes[:, 2:] = bboxes[:, 2:] - bboxes[:, 0:2]
         scores = [d[-1] for d in detections]
-        print("====Running Grpc CLient====")
+        # print("====Running Grpc CLient====")
 
         response=grpcclient.get_url({"usecase_id":usecase_id,"cameraid":cameraid,"image":frame,"bboxes":bboxes})
         features=response[2]
-        print("====grpc execution done")
+        # print("====grpc execution done")
 
         #features = self.encoder.encode(frame, bboxes)
 
         dets = []
         for bbox_id, bbox in enumerate(bboxes):
-            print("=====enumerate boxes====")
+            # print("=====enumerate boxes====")
             # print(features[bbox_id])
             dets.append(Detection(bbox, scores[bbox_id], features[bbox_id]))
 

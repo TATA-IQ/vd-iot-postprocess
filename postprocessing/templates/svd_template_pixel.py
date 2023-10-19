@@ -8,8 +8,9 @@ from threading import Lock
 from src.cache import Caching
 # svd_smd = SharedMemoryDict(name='svd', size=10000000)
 from datetime import datetime
+from src.compute import Computation
 
-class SVDTemplate(Template,Caching):
+class SVDTemplate(Template,Caching,IncidentExtract):
     def __init__(self,image,image_name,camera_id,image_time,steps,frame,incidents,usecase_id,tracker=None,rcon=None):
         print("====Initializing SVD=====")
         self.rcon=rcon
@@ -33,71 +34,44 @@ class SVDTemplate(Template,Caching):
             if data is None:
                 self.initialize_cache()
     
-
+    def get_lines_per_pixel(self,y1,y2):
+        lines_diff=y2-y1
+        
+        start_cord=[]
+        end_cord=[]
+        slope=[]
+        for i in range(y1,y2,1):
+            start_cord.append(i)
+            end_cord.append(i)
+    
+        return start_cord,end_cord
+    def speedcalc(distlist,timelist):
+        uniqpix=list(set(distlist))
+        speedlist=[]
+        print(uniqpix)
+        print(timelist)
+        for i in range(1,len(uniqpix)):
+            td1=uniqpix[i-1]
+            td2=uniqpix[i]
+            idx1=distlist.index(td1)
+            idx2=distlist.index(td2)
+            tm1=timelist[idx1]
+            tm2=timelist[idx2]
+            print(tm2,tm1)
+            print("distance====>",(idx2-idx1)*0.07)
+            print("time=====>",(tm2-tm1).total_seconds())
+            spd=round((((idx2-idx1)*0.07)/(tm2-tm1).total_seconds())*(18/5),2)
+            speedlist.append(spd)
+            print(speedlist)
+        return np.mean(speedlist)
     def draw_line(self, frame,frame_width,line_list):
         for lin in line_list:
             cv2.line(frame, (lin[0], lin[1]), (frame_width, lin[-1]),  color=(0, 255, 0), thickness=2)
         return frame
 
-    def speed_cal(self, T1, T2, T3):
-        print("======Calling Speed Calculation======")
-        if T1 is None:
-            T1=datetime.strptime(T1,"%Y-%m-%d %H:%M:%S.%f")
-        if T2 is None:
-            T2=datetime.strptime(T2,"%Y-%m-%d %H:%M:%S.%f")
-        if T3 is None:
-            T3=datetime.strptime(T3,"%Y-%m-%d %H:%M:%S.%f")
-        time_diff_1 = T2 - T1
-        time_diff_2 = T3 - T2
-        time_diff = time_diff_1 + time_diff_2
-        if time_diff != 0:
-            distance = 20  # meters
-            speed_res = distance / time_diff
-            speed_res = round(speed_res * 3.6, 2)
-        return speed_res
             
-    def line(self, frame,frame_width,frame_height):
-        y_1 = max(0, min(frame_height - 1, self.y_l1))
-        y_3 = max(0, min(frame_height - 1, self.y_l2))
-        # line between line 1 and line 3
-        y_2 = int((self.y_l1 + self.y_l2)//2)
-        y_2 = max(0, min(frame_height - 1, y_2))
-        cv2.line(frame, (0, y_1), (frame_width, y_1),  color=(0, 255, 0), thickness=2)
-        cv2.line(frame, (0, y_2), (frame_width, y_2),  color=(0, 255, 0), thickness=2)
-        cv2.line(frame, (0, y_3), (frame_width, y_3),  color=(0, 255, 0), thickness=2)
-        line_one_ = [0, y_1, frame_width, y_1]
-        line_two_ = [0, y_2, frame_width, y_2]
-        line_three_ = [0, y_3, frame_width, y_3]
-        list_lines=[]
-        list_lines.append(line_one_)
-        list_lines.append(line_two_)
-        list_lines.append(line_three_)
-        frame=self.draw_line(frame,frame_width,list_lines)
-        return frame,list_lines
-            
-    def intersecting_lines_down(self, obj_id,vehicle_ymax,line_list,image):
-        # print('time dict :', cachedict["time_dict"][str(obj_id)])
-        temp_line_list=list(reversed(line_list[1:-1]))
-        for idx,li in enumerate(temp_line_list):
-            if vehicle_ymax<=li[1]:
-                cachedict["time_dict"][str(obj_id)]["time"]['t'+str(idx+2)]=self.image_time
-                cachedict["time_dict"][str(obj_id)]["vehicle_coords"].append([cachedict["time_dict"][str(obj_id)]["coords"]["xmin"],cachedict["time_dict"][str(obj_id)]["coords"]["ymin"],cachedict["time_dict"][str(obj_id)]["coords"]["xmax"],cachedict["time_dict"][str(obj_id)]["coords"]["ymax"]])
                         
-    def check_up_down(self, line1_y1, line2_y1, y2):
-        d1 = abs(line1_y1 - y2)
-        d2 = abs(line2_y1 - y2)
-        k = min(d1, d2)
-        if k == d1:
-            return "up"
-        elif k == d2:
-            return "down"
-    def intersecting_lines_up(self, obj_id,vehicle_ymax,line_list):
-        temp_line_list=line_list[1:-1]
-        for idx,li in enumerate(temp_line_list):
-            if vehicle_ymax<=li[1]:
-                cachedict["time_dict"][str(obj_id)]["time"]['t'+str(idx+2)]=self.image_time
-                cachedict["time_dict"][str(obj_id)]["vehicle_coords"].append([cachedict["time_dict"][str(obj_id)]["coords"]["xmin"],cachedict["time_dict"][str(obj_id)]["coords"]["ymin"],cachedict["time_dict"][str(obj_id)]["coords"]["xmax"],cachedict["time_dict"][str(obj_id)]["coords"]["ymax"]])
-
+    
     
     def process_steps(self):
         print("=====template step proces=====")
@@ -146,10 +120,8 @@ class SVDTemplate(Template,Caching):
             print(detectlist)
             cv2.imwrite("output/"+self.image_name,frame)
         cv2.imwrite("input/"+self.image_name,self.frame)
-        #TemplateTracking()
-        # print("=========incident dict======")
-        # print(incident_dict)
-        # return filtered_res_dict, incident_dict
+    
+    
     def initialize_cache(self):
         print("=====start caching initialization=====")
         cachedict={}
@@ -158,55 +130,15 @@ class SVDTemplate(Template,Caching):
         cachedict["object_dict"]={}
         cachedict["time_dict"]={}
         cachedict["detections"]=[]
+        cachedict["road_map"]=[]
+        cachedict["image_height"]=640
+        cachedict["image_width"]=640
+
         print("======caching initialization done====")
-        self.setbykey("svd",self.camera_id,self.usecase_id,cachedict)
+        self.setbykey("svd_new",self.camera_id,self.usecase_id,cachedict)
         print("=====cache dict saved to cache")
         # return cachedict
-    def speedbypixel(self,idx,time,x,y,x_change,y_change):
-        speedpixel=[]
-        cf=[]
-        speedms=[]
-        averagecf=0
-        speedms2=[]
-        for i in range(1,len(x)):
-            start=(x[i-1],y[i-1])
-            end=(x[i],y[i])
-            startx=x_change[i-1]
-            endx=x_change[i]
-            cf.append(2/x_change[i])
-            cf.append(2/x_change[i-1])
-            
-            start_time=datetime.strptime(time[i-1],"%Y-%m-%d %H:%M:%S.%f")
-            end_time=datetime.strptime(time[i],"%Y-%m-%d %H:%M:%S.%f")
-            distance=round(np.sqrt(((start[0]-end[0])**2)+((start[1]-end[1])**2)),2)
-            timespent=np.abs((end_time-start_time).total_seconds())
-
-            speedpixel.append(round(distance/timespent,2))
-            averagecf=np.mean(cf)
-            speedms.append((distance/averagecf)/timespent)
-            speedms2.append((distance*averagecf)/timespent)
-        
     
-        print("speed===>",speedpixel)
-        print("speed in m/s===>",speedms)
-        print("speed of vehicle in pixel==>",round(np.mean(speedpixel),2))
-        print("speed in m/s===>",round(np.mean(speedms),2))
-        print("speed ms2===>",speedms2)
-        return round(np.mean(speedms),2)
-
-    def pixel_displacement(self,detectionlist,idx):
-        required_dict_det=list(filter(lambda x:int(x["id"])==int(idx),detectionlist))
-        total_time=list([x["image_time"] for x in required_dict_det])
-        xmin=list([x["xmin"] for x in required_dict_det])
-        ymin=list([x["ymin"] for x in required_dict_det])
-        xmax=list([x["xmax"] for x in required_dict_det])
-        ymax=list([x["ymax"] for x in required_dict_det])
-        x=list([(x["xmin"]+x["xmax"]) for x in required_dict_det])
-        y=list([(x["ymin"]+x["ymax"]) for x in required_dict_det])
-        x_change=list([(x["xmax"]-x["xmin"]) for x in required_dict_det])
-        y_change=list([(x["ymax"]-x["ymin"]) for x in required_dict_det])
-        return self.speedbypixel(idx,total_time,x,y,x_change,y_change)
-
         
     def update_speed(self,filtered_res_dict,track_id,speed):
         listresult=[]
@@ -227,30 +159,24 @@ class SVDTemplate(Template,Caching):
         speed=0
         trackids=[i["id"] for i in filtered_res_dict]
         classidlist=[i["class_id"] for i in filtered_res_dict]
-        classnamelist=[i["class_id"] for i in filtered_res_dict]
+        classnamelist=[i["class_name"] for i in filtered_res_dict]
         detectlist=[i for i in filtered_res_dict]  
         detection_speed_list=None 
         vehicle_speed=0
         h,w,c=self.frame.shape
 
-        frame,line_list=self.line(self.frame,w,h)
-        id_list=[]
         
-        cachedict=self.getbykey("svd",self.camera_id,self.usecase_id)
+        cachedict=self.getbykey("svd_new",self.camera_id,self.usecase_id)
         
         if cachedict is  None:
             self.initialize_cache()
             
         else:
             
-            cachedict=self.getbykey("svd",self.camera_id,self.usecase_id)
+            cachedict=self.getbykey("svd_new",self.camera_id,self.usecase_id)
             
             cachedict["detections"].extend(filtered_res_dict)
             
-            
-            
-            print("=====cachedict====")
-           
             for idx,id_ in enumerate(trackids):
                 print("====idx checking====")
                 if id_ in cachedict["unique_id"]:

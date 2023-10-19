@@ -50,15 +50,15 @@ class TemplateTracking():
         if len(list_det)>0:
             tracker_obj.update(self.usecase_id,self.camera_id,self.grpcclient,frame,list_det)
 
-        print("===track updated===")
+        # print("===track updated===")
         
-        print("=========Length of detection",len(detection_output), len(list_det))
+        # print("=========Length of detection",len(detection_output), len(list_det))
         if tracker_obj.tracks is  not None:
             print("tracker.track objesct is not None")
             try:
 
                 for trk,det in zip(tracker_obj.tracks,detection_output):
-                    print("======inside tracker=====")
+                    #print("======inside tracker=====")
                     # print("===>",trk.__dir__())
                     det["id"]=trk.track_id
                     detections.append(det)

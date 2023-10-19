@@ -15,7 +15,7 @@ class DetectionProcess():
         
         listresult=[]
         print("======expected class====")
-        print(self.expected_class)
+        # print(self.expected_class)
         # print(uploaded_class_name_list)
         
         for detc in self.detected_class:
@@ -32,8 +32,8 @@ class DetectionProcess():
                     detc["image_time"]=str(self.image_time)
                     detc["incident_status"]=False
                     listresult.append(detc)
-        print("====end of detectec class======")
-        print(listresult)
+        # print("====end of detectec class======")
+        # print(listresult)
         return listresult
     
     def masked_detection(self,mask,image,detections):

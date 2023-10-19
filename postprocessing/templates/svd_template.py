@@ -5,12 +5,14 @@ import cv2
 import numpy as np
 from shared_memory_dict import SharedMemoryDict
 from threading import Lock
+from src.incidents import IncidentExtract
+from src.compute import Computation
 from src.cache import Caching
 # svd_smd = SharedMemoryDict(name='svd', size=10000000)
 from datetime import datetime
 from src.number_plate_template import NumberPlateTemplate
 
-class SVDTemplate(Template,Caching):
+class SVDTemplate(Template,Caching,IncidentExtract):
     def __init__(self,image,image_name,camera_id,image_time,steps,frame,incidents,usecase_id,tracker=None,rcon=None):
         print("====Initializing SVD=====")
         self.rcon=rcon
@@ -23,7 +25,7 @@ class SVDTemplate(Template,Caching):
         self.rcon=rcon
         self.image_time=image_time
         self.cache_data=None
-        self.y_l1, self.y_l2 = 177, 280 #800 ,1000#800 ,1000#920 ,1200#412, 670
+        self.y_l1, self.y_l2 = 360, 420 #800 ,1000#800 ,1000#920 ,1200#412, 670
         Template.__init__(self,image,image_name,camera_id,image_time,steps,frame)
         if self.rcon is not None:
             print("=======cahching initialization=====")
@@ -50,7 +52,7 @@ class SVDTemplate(Template,Caching):
             T2=datetime.strptime(T2,"%Y-%m-%d %H:%M:%S.%f")
         if T3 is not None:
             T3=datetime.strptime(T3,"%Y-%m-%d %H:%M:%S.%f")
-        T1, T2, T3 = T1, T2, T3
+        # T1, T2, T3 = T1, T2, T3
         print("====Aftr float convrsion======")
         time_diff_1 = (T2 - T1).total_seconds()
         time_diff_2 = (T3 - T2).total_seconds()
@@ -122,6 +124,9 @@ class SVDTemplate(Template,Caching):
                         print("=====pred class==")
                         self.final_prediction["prediction_class"]=self.filtered_output
                         # print('==final pred :', self.final_prediction)
+                else:
+                    continue
+
             return self.final_prediction
         
     def np_plate_calc(self, vehicle_detection , numberplate_detection):
@@ -138,16 +143,19 @@ class SVDTemplate(Template,Caching):
         print("length of vehicle===>",len(vehicle_detection))
         if len(numberplate_detection)>0:
             print("#"*50)
-            np_plate = NumberPlateTemplate(self.frame,self.usecase_id,self.camera_id,self.image_time)
+            np_plate = NumberPlateTemplate(self.frame,self.usecase_id,self.camera_id,self.image_time,self.image_name)
             np_plate=np_plate.process_np(vehicle_detection,numberplate_detection,self.steps)
             print('predicted np plate=========')
             print(np_plate)
             print("%"*50)
+            return np_plate
        
 
     def process_data(self):
         print("==============SVD==========")
         filtered_res_dict=[]
+        detection_incidentflag={}
+        detection_incidentflag["prediction_class"]=[]
         self.process_steps()
         if "prediction_class" in self.final_prediction:
             filtered_res_dict=self.final_prediction["prediction_class"]      
@@ -159,14 +167,26 @@ class SVDTemplate(Template,Caching):
         print("=====tracking done=====")
 
         if len(filtered_res_dict)>0:
+            detection_dict={}
+            detection_dict["prediction_class"]=[]
             print("=======going for svd======")
             np_image = "output/"+self.image_name
-            frame,detectlist=self.svd_calculation(filtered_res_dict)
+            frame,detection_dict["prediction_class"]=self.svd_calculation(filtered_res_dict)
+            Computation.__init__(self,detection_dict,self.steps["2"],frame)
+            detection_dict=self.speed_computation()
+            IncidentExtract.__init__(self,detection_dict,self.incidents,self.allsteps)
+            incident_dict,detection_incidentflag["prediction_class"]=self.vehicle_incident_svd()
+            return detection_dict["prediction_class"], incident_dict, self.expected_class, frame
+
+
             # print("=======speed======")
             # print(detectlist)
-            np_image = "output/"+self.image_name
-            cv2.imwrite("output/"+self.image_name,frame)
-        cv2.imwrite("input/"+self.image_name,self.frame)
+        #     np_image = "output/"+self.image_name
+        #     cv2.imwrite("output/"+self.image_name,frame)
+        # cv2.imwrite("input/"+self.image_name,self.frame)
+        else:
+            return [], [], self.expected_class, frame
+
         
         #TemplateTracking()
         # print("=========incident dict======")
@@ -251,9 +271,10 @@ class SVDTemplate(Template,Caching):
         trackids= [i["id"] for i in filtered_res_dict if i["class_name"]== "car"] 
         classidlist=[i["class_id"] for i in filtered_res_dict if i["class_name"]== "car"]
         classnamelist=[i["class_id"] for i in filtered_res_dict if i["class_name"]== "car"]
-        detectlist=[i for i in filtered_res_dict if i["class_name"]== "car"] 
+        detectlist=[i for i in filtered_res_dict]# if i["class_name"]== "car"] 
         nplist = [i for i in filtered_res_dict if i["class_name"]== "numberplate"]
-        print('======detection list======')
+        print('======image time======')
+        # print(self.image_time)
         # print(detectlist)
         detection_speed_list=None 
         vehicle_speed=0
@@ -281,7 +302,7 @@ class SVDTemplate(Template,Caching):
                     # print("======speed list updated====")
                 
 
-                elif classnamelist[idx].lower() =="np" or  classnamelist[idx].lower()!="numberplate": #all classe by default except numberplate
+                elif classnamelist[idx].lower() !="np" or  classnamelist[idx].lower()!="numberplate": #all classe by default except numberplate
                     print("===executing elif")
                     cachedict["unique_id"].append(id_)
                     print("=====checking firction====")
@@ -301,7 +322,7 @@ class SVDTemplate(Template,Caching):
                 print("====Got Det====")
                 if len(cachedict["unique_id_direction"])>0:
                     for j in range(0, len(cachedict["unique_id_direction"])):    
-                            if cachedict["unique_id_direction"][j][0] in trackids and cachedict["unique_id_direction"][j][1]["direction"]=="down":
+                            if cachedict["unique_id_direction"][j][0] in trackids and cachedict["unique_id_direction"][j][1]["direction"]=="down" and cachedict["unique_id_direction"][j][1]['class_name'] == 'car':
                                 # print("====checking for down====",j)
                                 # print(cachedict["unique_id_direction"][j][1])
                                 # print("=====condition check===")
@@ -316,6 +337,7 @@ class SVDTemplate(Template,Caching):
                                 # print("=====Box checking done=====")
                                 if cachedict["time_dict"][str(obj_id)]['y2'] is not None and cachedict["time_dict"][str(obj_id)]['y2']<=line_list[2][1]:
                                     if cachedict["time_dict"][str(obj_id)]['t1'] is None:
+                                        print('t1 :', str(self.image_time), '========', self.image_time)
                                         cachedict["time_dict"][str(obj_id)]['t1']=str(self.image_time)
                                         vehicle_detectdown = [i for i in filtered_res_dict if i["class_name"]== "car"] 
                                         nplist = [i for i in filtered_res_dict if i["class_name"]== "numberplate"]
@@ -329,10 +351,10 @@ class SVDTemplate(Template,Caching):
                                     if cachedict["time_dict"][str(obj_id)]['y2'] > line_list[0][1]:
                                         if cachedict["time_dict"][str(obj_id)]['t3'] is None:
                                             cachedict["time_dict"][str(obj_id)]['t3'] = str(self.image_time)
-                                    # print('time dict down :', cachedict["time_dict"])
+                                    print('time dict down :', cachedict["time_dict"])
                                 if cachedict["time_dict"][str(obj_id)]['t1'] is not None and cachedict["time_dict"][str(obj_id)]['t2'] is not None and cachedict["time_dict"][str(obj_id)]['t3'] is not None and cachedict["time_dict"][str(obj_id)]['class'] == 'car':
                                     try:    
-                                        print('::::::processing for up ids:::::')
+                                        print('::::::processing for down ids:::::')
                                         vehicle_speed = self.speed_cal(cachedict["time_dict"][str(obj_id)]['t1'], cachedict["time_dict"][str(obj_id)]['t2'], cachedict["time_dict"][str(obj_id)]['t3'])
                                         print('speed ::',vehicle_speed)
                                         cachedict["time_dict"][str(obj_id)]['speed'] = vehicle_speed
@@ -340,19 +362,28 @@ class SVDTemplate(Template,Caching):
                                             print('=====calling np func======')
                                             vehicle_detection = [i for i in filtered_res_dict if i["id"]== obj_id]
                                             self.np_plate_calc(vehicle_detectdown,nplist)
-                                            
+                                            npdet = self.np_plate_calc(vehicle_detection,nplist)
+                                            cachedict["time_dict"]["numberplate_dict"] = npdet
+                                            print('=======npdet========')
+                                            print(npdet)                                            
                                         print("Object ID:", obj_id, "Speed:", vehicle_speed, 'kmph')
                                         print('time dict up :', cachedict["time_dict"])
-                                        detectlist[idx]["speed"]=vehicle_speed
+                                        for j in range(len(npdet)):
+                                            npdet[j]['speed'] = vehicle_speed
+                                        print('==after update====')
+                                        print(npdet)
+                                        detectlist[idx]["np_plate"] = npdet
+                                        print('=============')
                                     except:
                                         pass
                             
-                            if cachedict["unique_id_direction"][j][0] in trackids and cachedict["unique_id_direction"][j][1]["direction"]=="up":
+                            if cachedict["unique_id_direction"][j][0] in trackids and cachedict["unique_id_direction"][j][1]["direction"]=="up" and cachedict["unique_id_direction"][j][1]['class_name'] == 'car':
                                 # print("=======checking for up====",j)
                                 # print(cachedict["unique_id_direction"][j][1])
                                 obj_id = cachedict["unique_id_direction"][j][0]
                                 class_name = cachedict["unique_id_direction"][j][1]['class_name']
                                 dir_up = cachedict["unique_id_direction"][j][1]['direction']
+                                # nplist = [i for i in filtered_res_dict if i["class_name"]== "numberplate"]
                                 print("======obj id got=====")
                                 for id_ , box_ in id_list:
                                     if id_==obj_id:
@@ -384,14 +415,22 @@ class SVDTemplate(Template,Caching):
                                         vehicle_speed = self.speed_cal(cachedict["time_dict"][str(obj_id)]['t1'], cachedict["time_dict"][str(obj_id)]['t2'], cachedict["time_dict"][str(obj_id)]['t3'])
                                         print('speed ::',vehicle_speed)
                                         cachedict["time_dict"][str(obj_id)]['speed'] = vehicle_speed
-                                        if cachedict["time_dict"][str(obj_id)]['speed'] > 2:
+                                        if cachedict["time_dict"][str(obj_id)]['speed'] > 0:
                                             print('=====calling np func======')
                                             vehicle_detection = [i for i in filtered_res_dict if i["id"]== obj_id]
-                                            self.np_plate_calc(vehicle_detection,nplist)
-                                            
+                                            npdet = self.np_plate_calc(vehicle_detection,nplist)
+                                            cachedict["time_dict"]["numberplate_dict"] = npdet
+                                            print('=======npdet========')
+                                            print(npdet)                                            
                                         print("Object ID:", obj_id, "Speed:", vehicle_speed, 'kmph')
                                         print('time dict up :', cachedict["time_dict"])
-                                        detectlist[idx]["speed"]=vehicle_speed
+                                        for j in range(len(npdet)):
+                                            npdet[j]['speed'] = vehicle_speed
+                                        print('==after update====')
+                                        print(npdet)
+                                        detectlist[idx]["np_plate"] = npdet
+                                        print('=============')
+                                        print(detectlist)
                                     except:
                                         pass
         print("#########################")
@@ -401,10 +440,19 @@ class SVDTemplate(Template,Caching):
             self.setbykey("svd",self.camera_id,self.usecase_id,cachedict)
         print("======saving done===")
         print("#########################")
-        if detection_speed_list is None:
-            return frame, detectlist
-        else:
-            return frame, detection_speed_list
+        
+
+
+        # if detection_speed_list is None:
+        print("&"*30)
+        print(detectlist)
+        print("^"*30)
+        return frame, detectlist
+        
+        # else:
+        #     return frame, detection_speed_list
+        print('=====calling incidents==========')
+
         
 
                                         

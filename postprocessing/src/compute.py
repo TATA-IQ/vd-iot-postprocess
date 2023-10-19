@@ -51,6 +51,8 @@ class Computation():
             self.detection_output["misc"]=misc
     
     def svd(self):
+
+
         pass
 
     def ddp_computation(self):
@@ -79,6 +81,40 @@ class Computation():
             else:
                 self.detection_output["misc"]=misc
         return self.detection_output
+    
+    def speed_computation(self):
+        misc=[]
+        if "prediction_class" in self.detection_output:
+            for i in self.detection_output["prediction_class"]:
+                listres=[]
+                if "speed" in i:
+                    dictres={}
+                    dictres["data"]=i["speed"]
+                    dictres["text"]="speed"
+                    dictres2["id"]=i["id"]
+                    misc.append(dictres)
+                if i["class_name"] in i:
+                    dictres2={}
+                    dictres2["data"]=i[i["class_name"]]
+                    dictres2["text"]="numberplate"
+                    dictres2["id"]=i["id"]
+                    misc.append(dictres2)
+        
+    
+        if "misc" in self.detection_output:
+            
+            self.detection_output["misc"].extend(misc)
+        else:
+            self.detection_output["misc"]=misc
+        
+        return self.detection_output
+        
+
+
+
+
+
+
     
     def process_computation(self):
         compute_name=self.steps["computation_name"]

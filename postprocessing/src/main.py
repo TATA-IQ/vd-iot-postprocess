@@ -85,7 +85,7 @@ class PostProcessingApp():
         
     def create_packet(self,image,detection_output,incident_output):
         self.metadata["prediction"]=detection_output
-        self.metadata["incident"]=incident_output
+        self.metadata["usecase"]["incident"]=incident_output
         self.metadata["incident_count"]=len(incident_output)
         self.metadata["pipeline_inform"]["model_meta"]={}
         self.metadata["pipeline_inform"]["model_meta"]=self.model_meta
@@ -101,8 +101,8 @@ class PostProcessingApp():
         tempname=self.image_name.split(".")[0]
         # with open("kafkamessages/"+tempname+".txt","w") as f:
         #     f.write(image_str)
-        # with open("kafkamessages/"+tempname+".json", "w") as outfile:
-        #     json.dump(self.metadata, outfile)
+        with open("kafkamessages/"+tempname+".json", "w") as outfile:
+            json.dump(self.metadata, outfile)
 
         return {"raw_image":image_str,"processed_image":image_str,"incident_event":self.metadata,"usecase":self.metadata["usecase"]}
 
@@ -177,6 +177,15 @@ class PostProcessingApp():
         detection_output,incident_out,expected_class, masked_image, misc_data=bt.process_data()
         self.prepare_send(expected_class,detection_output,incident_out,image_back,misc_data)
 
+    def svd_detect(self,mask,image_back):
+        tracker=TemplateTracking(self.usecase_id,self.camera_id,self.grpcclient)
+        svd=SVDTemplate(self.image,self.image_name,self.camera_id,self.image_time,self.steps,self.frame,self.incidents,self.usecase_id,tracker,rcon=self.rcon)
+        detection_output,incident_out,expected_class, masked_image=svd.process_data()
+        self.prepare_send(expected_class,detection_output,incident_out,masked_image)
+        print("====svd incident======")
+        print(incident_out)
+
+
 
 
     
@@ -218,9 +227,11 @@ class PostProcessingApp():
         # if int(self.usecase_template_id)==1:
         #     self.ppe_detect(mask,image_back)
         # tracker=TemplateTracking(self.usecase_id,self.camera_id,self.grpcclient)
-        tracker=TemplateTracking(self.usecase_id,self.camera_id,self.grpcclient)
-        svd=SVDTemplate(self.image,self.image_name,self.camera_id,self.image_time,self.steps,self.frame,self.incidents,self.usecase_id,tracker,rcon=self.rcon)
-        svd.process_data()
+        #image,image_name,camera_id,image_time,steps,frame,incidents,usecase_id,tracker=None,rcon=None
+        # tracker=TemplateTracking(self.usecase_id,self.camera_id,self.grpcclient)
+        # svd=SVDTemplate(self.image,self.image_name,self.camera_id,self.image_time,self.steps,self.frame,self.incidents,self.usecase_id,tracker,rcon=self.rcon)
+        # svd.process_data()
+        self.svd_detect(mask,image_back)
         
         # print("=======crowd======")
         # self.crowd_counting(mask,image_back)
@@ -236,15 +247,15 @@ class PostProcessingApp():
     
     def process(self):
         print("=========",self.camera_id,self.usecase_template_id)
-        # if ( int(self.camera_id)==6) and int(self.usecase_id)==4:
-        #     self.call_template()
+        if  int(self.camera_id)==3 and int(self.usecase_template_id)==2:
+            self.call_template()
         # for steps in list(self.steps.values()):
         #     self.model_meta.append({"model_url":steps["modqel_url"],"model_type":steps["model_type"],"model_framework":steps["model_framework"],"model_id":steps["model_id"]})
         #     #self.process_step_model.append(steps["model_url"],steps["classes"],steps["model_type"],steps["model_framework"])
         # self.call_template()
         # if  int(self.camera_id)==3 and int(self.usecase_template_id)==2:
         #     print(self.usecase_id)
-        self.call_template()
+        #self.call_template()
 
     
 

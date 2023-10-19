@@ -122,10 +122,10 @@ class Track:
         self.mean, self.covariance = kf.predict(self.mean, self.covariance)
         self.age += 1
         self.time_since_update += 1
-        print("===update age=====")
-        print(self.age)
-        print("=======time since update===")
-        print(self.time_since_update)
+        # print("===update age=====")
+        # print(self.age)
+        # print("=======time since update===")
+        # print(self.time_since_update)
 
     def update(self, kf, detection):
         """Perform Kalman filter measurement update step and update the feature
@@ -145,10 +145,10 @@ class Track:
 
         self.hits += 1
         self.time_since_update = 0
-        print("=========hits==========")
+        # print("=========hits==========")
         
-        print(self.hits,self._n_init)
-        print(self.state)
+        # print(self.hits,self._n_init)
+        # print(self.state)
         if self.state == TrackState.Tentative and self.hits >= self._n_init:
             self.state = TrackState.Confirmed
 

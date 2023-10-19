@@ -27,7 +27,7 @@ class IncidentExtract():
         self.incident_type_name=[i["incident_type_name"] for i in self.incident_values]
         
     
-    def vehicle_incident(self):
+    def vehicle_incident_anpr(self):
         print("====calling base incident===")
         dictwithincidentflag=[]
         incidentlist=[]
@@ -48,6 +48,47 @@ class IncidentExtract():
                     incidentdict["coordinate"]={"x1":dtdata["xmin"],"x2":dtdata["xmax"],"y1":dtdata["ymin"],"y2":dtdata["ymax"]}
                     print("#####executed4")
                     incidentdict["misc"]=[{"numberplate":dtdata[dtdata["class_name"]]}]
+                    print("=============")
+                    print(incidentdict)
+                    dtdata["incident_status"]=True
+                    self.incident_id=self.incident_id+1
+                    incidentlist.append(incidentdict)
+                    dictwithincidentflag.append(dtdata)
+                else:
+                    dtdata["incident_status"]=False
+                    dictwithincidentflag.append(dtdata)
+            print("*************Incident list********")
+            print(incidentlist)
+        else:
+            print("-------not exist------")
+
+        return incidentlist, dictwithincidentflag
+
+    def vehicle_incident_svd(self):
+        print("====calling base incident===")
+        dictwithincidentflag=[]
+        incidentlist=[]
+        trackids=[]
+        if "misc" in self.detection_output:
+            trackids=[i["id"] for i in self.detection_output["misc"] ]
+        if "prediction_class" in self.detection_output:
+            for dtdata in self.detection_output["prediction_class"]:
+                incidentdict={}
+                print("++++++++++",dtdata)
+                if "speed" in dtdata and dtdata["id"] in trackids :
+                    print("classname got", dtdata["class_name"])
+                    #if dtdata["class_name"] in self.incident_class:
+                    incidentdict["id"]=self.incident_id
+                    print("#######executed1")
+                    incidentdict["incident_id"]=str(self.incident_class_id[self.incident_class.index(dtdata["class_name"])])
+                    print("#####executed2")
+                    incidentdict["name"]=self.incident_name[self.incident_class.index(dtdata["class_name"])]
+                    print("#####executed3")
+                    incidentdict["coordinate"]={"x1":dtdata["xmin"],"x2":dtdata["xmax"],"y1":dtdata["ymin"],"y2":dtdata["ymax"]}
+                    print("#####executed4")
+                    incidentdict["misc"]=[{"data":dtdata["speed"],"text":"speed"}]
+                    if dtdata[dtdata["class_name"]] in dtdata:
+                        incidentdict["misc"].append({"data":dtdata[dtdata["class_name"]],"text":"nuberplate"})
                     print("=============")
                     print(incidentdict)
                     dtdata["incident_status"]=True
@@ -149,7 +190,7 @@ class IncidentExtract():
 
         incidentdict["id"]=self.incident_id
         print("*******",idx)
-        incidentdict["incident_id"]=str(self.incident_class_id[idx])
+        incidentdict["incident_id"]=int(self.incident_class_id[idx])
         incidentdict["name"]=self.incident_name[idx]
         incidentdict["coordinate"]={"x1":"","x2":"","y1":"","y2":""}
         incidentdict["misc"]=incident_list

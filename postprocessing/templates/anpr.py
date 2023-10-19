@@ -132,7 +132,7 @@ class ANPRTemplate(Template,Caching,IncidentExtract,PostProcessing,NumberPlateTe
         if "prediction_class" in filtered_res_dict:
             detection_data=filtered_res_dict["prediction_class"]
             IncidentExtract.__init__(self,filtered_res_dict,self.incidents,self.allsteps)
-            incident_dict,detection_incidentflag["prediction_class"]=self.vehicle_incident()
+            incident_dict,detection_incidentflag["prediction_class"]=self.vehicle_incident_anpr()
         print("=========incident dict======")
         
         print("=======detection data====")
