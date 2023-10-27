@@ -2,5 +2,6 @@
 init-hook='import sys; sys.path.append(".")'
 max-line-length=240
 max-args=10
+ignore='grpc_protos'
 [MESSAGES CONTROL]
-disable=C0303, R0902, E1101, R1705
+disable=C0303, R0902, E1101, R1705, R0913, R0801

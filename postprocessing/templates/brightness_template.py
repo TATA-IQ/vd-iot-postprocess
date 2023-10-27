@@ -1,62 +1,60 @@
+from src.cache import Caching
 from src.common_template import Template
 from src.incidents import IncidentExtract
-from src.cache import Caching
-class BrightnessTemplate(Template,IncidentExtract,Caching):
-    def __init__(self,image,image_name,camera_id,image_time,steps,frame,incidents,usecase_id,rcon=None):
+
+
+class BrightnessTemplate(Template, IncidentExtract, Caching):
+    def __init__(self, image, image_name, camera_id, image_time, steps, frame, incidents, usecase_id, rcon=None):
         print("====Initializing crowd=====")
-        self.frame=image
-        self.allsteps=steps
-        self.incidents=incidents
-        self.rcon=rcon
-        self.usecase_id=usecase_id
-        Template.__init__(self,image,image_name,camera_id,image_time,steps,frame)
+        self.frame = image
+        self.allsteps = steps
+        self.incidents = incidents
+        self.rcon = rcon
+        self.usecase_id = usecase_id
+        Template.__init__(self, image, image_name, camera_id, image_time, steps, frame)
         if self.rcon is not None:
             print("=======cahching initialization=====")
-            Caching.__init__(self,self.rcon)
+            Caching.__init__(self, self.rcon)
             print("====Caching INitilaize done")
-            data=self.getbykey('brightness',self.camera_id,self.usecase_id)
+            data = self.getbykey("brightness", self.camera_id, self.usecase_id)
             if data is None:
                 self.initialize_cache()
+
     def initialize_cache(self):
-        cachedict={}
-        cachedict["detections"]=[]
-    def set_cache(self,currentdata,cachedict):
+        cachedict = {}
+        cachedict["detections"] = []
+
+    def set_cache(self, currentdata, cachedict):
         if cachedict is not None:
-            if len(cachedict["detections"])>9:
+            if len(cachedict["detections"]) > 9:
                 print(len(cachedict))
-                for i in range(10,len(cachedict["detections"])):
+                for i in range(10, len(cachedict["detections"])):
                     del cachedict["detections"][i]
 
-                
-                cachedict["detections"].insert(0,currentdata)
+                cachedict["detections"].insert(0, currentdata)
             else:
-                cachedict["detections"].insert(0,currentdata)
+                cachedict["detections"].insert(0, currentdata)
         else:
-            cachedict={}
-            cachedict["detections"]=[]
-            cachedict["detections"].insert(0,currentdata)
-        self.setbykey("brightness",self.camera_id,self.usecase_id,cachedict)
-        
+            cachedict = {}
+            cachedict["detections"] = []
+            cachedict["detections"].insert(0, currentdata)
+        self.setbykey("brightness", self.camera_id, self.usecase_id, cachedict)
+
     def process_data(self):
         print("==============Data==========")
-        filtered_res_dict={}
-        
-        
-        filtered_res_dict=self.process_steps()
+        filtered_res_dict = {}
+
+        filtered_res_dict = self.process_steps()
         print("====Process called=======")
         print(filtered_res_dict)
-        cachedict=self.getbykey("brightness",self.camera_id,self.usecase_id)
-        IncidentExtract.__init__(self,filtered_res_dict,self.incidents,self.allsteps)
-        incident_dict,detected_output=self.process_incident()
+        cachedict = self.getbykey("brightness", self.camera_id, self.usecase_id)
+        IncidentExtract.__init__(self, filtered_res_dict, self.incidents, self.allsteps)
+        incident_dict, detected_output = self.process_incident()
         print("=========incident dict======")
         print(incident_dict)
         if "misc" in filtered_res_dict:
-            if len(filtered_res_dict)>0:
-                misc_data=filtered_res_dict["misc"]
+            if len(filtered_res_dict) > 0:
+                misc_data = filtered_res_dict["misc"]
         print("=====filtered res dict Brightness====")
         print(filtered_res_dict)
-        return None, incident_dict,self.expected_class, None,misc_data
-
-
-
-
+        return None, incident_dict, self.expected_class, None, misc_data

@@ -1,48 +1,30 @@
-# PostProcessing
-
-[![Release](https://img.shields.io/github/v/release/./PostProcessing)](https://img.shields.io/github/v/release/./PostProcessing)
-[![Build status](https://img.shields.io/github/actions/workflow/status/./PostProcessing/main.yml?branch=main)](https://github.com/./PostProcessing/actions/workflows/main.yml?query=branch%3Amain)
-[![codecov](https://codecov.io/gh/./PostProcessing/branch/main/graph/badge.svg)](https://codecov.io/gh/./PostProcessing)
-[![Commit activity](https://img.shields.io/github/commit-activity/m/./PostProcessing)](https://img.shields.io/github/commit-activity/m/./PostProcessing)
-[![License](https://img.shields.io/github/license/./PostProcessing)](https://img.shields.io/github/license/./PostProcessing)
-
-This is a template repository for Python projects that use Poetry for their dependency management.
-
-- **Github repository**: <https://github.com/./PostProcessing/>
-- **Documentation** <https://..github.io/PostProcessing/>
-
-## Getting started with your project
-
-First, create a repository on GitHub with the same name as this project, and then run the following commands:
-
-``` bash
-git init -b main
-git add .
-git commit -m "init commit"
-git remote add origin git@github.com:./PostProcessing.git
-git push -u origin main
-```
-
-Finally, install the environment and the pre-commit hooks with 
-
-```bash
-make install
-```
-
-You are now ready to start development on your project! The CI/CD
-pipeline will be triggered when you open a pull request, merge to main,
-or when you create a new release.
-
-To finalize the set-up for publishing to PyPi or Artifactory, see
-[here](https://fpgmaas.github.io/cookiecutter-poetry/features/publishing/#set-up-for-pypi).
-For activating the automatic documentation with MkDocs, see
-[here](https://fpgmaas.github.io/cookiecutter-poetry/features/mkdocs/#enabling-the-documentation-on-github).
-To enable the code coverage reports, see [here](https://fpgmaas.github.io/cookiecutter-poetry/features/codecov/).
-
-## Releasing a new version
+# Introduction 
+This is a Postprocessing repo. 
 
 
 
----
+# Architecture
+![Architectural Flow](postprocessing/images/postprocess.png)
 
-Repository initiated with [fpgmaas/cookiecutter-poetry](https://github.com/fpgmaas/cookiecutter-poetry).
+1. Postprocess APi is hosted using uvicorn
+2. Each time API is getting hit, requests are pushed to the internal queue
+3. To make the processing fast, we are running multiple process pool with thread pools to process the request faster
+4. Each threadpool has templates running, which will be switched based on the reuest coming from preprocess
+4. Each template have serveral usecases, and each usecases have detection model assigned. Once the model call the detection api, it will get detection result as output, which is further send to the tracking module. 
+5. Tracking module require, features encoding. Features Encoder is running as GRPC
+6. Once the tracking and other business logic is processed. Output is further send to the kafka topic.
+# Dependency
+1. This Module is dependent on the https://tatacommiot@dev.azure.com/tatacommiot/Video%20Based%20IoT/_git/vd-iot-dataapiservice
+2. This module also needs kafka broker
+3. This module will be dependent on various detection service and grpc server(repo is not created yet)
+
+# Installation
+1. Install Python3.9 
+2. Install redis-server
+3. poetry install
+
+# Run App
+python3 app.py
+
+# Docker 
+To-do: Docker Implementation

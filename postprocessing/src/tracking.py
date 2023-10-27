@@ -1,8 +1,9 @@
-from deep_sort.deep_sort.tracker import Tracker as DeepSortTracker
+import numpy as np
+
 # from deep_sort.tools.generate_detections import Encoding
 from deep_sort.deep_sort import nn_matching
 from deep_sort.deep_sort.detection import Detection
-import numpy as np
+from deep_sort.deep_sort.tracker import Tracker as DeepSortTracker
 
 
 class Tracker:
@@ -18,19 +19,18 @@ class Tracker:
 
         metric = nn_matching.NearestNeighborDistanceMetric("cosine", max_cosine_distance, nn_budget)
         self.tracker = DeepSortTracker(metric)
-    
+
     # def update_encoder(self,encoder=None):
 
     #     self.encoder = Encoding(encoder, batch_size=8)
-    
+
     # def delete_encoder(self):
     #     self.encoder=None
 
-    def update(self,usecase_id,cameraid, grpcclient,frame, detections):
-
+    def update(self, usecase_id, cameraid, grpcclient, frame, detections):
         if len(detections) == 0:
             self.tracker.predict()
-            self.tracker.update([])  
+            self.tracker.update([])
             self.update_tracks()
             return
 
@@ -39,11 +39,13 @@ class Tracker:
         scores = [d[-1] for d in detections]
         # print("====Running Grpc CLient====")
 
-        response=grpcclient.get_url({"usecase_id":usecase_id,"cameraid":cameraid,"image":frame,"bboxes":bboxes})
-        features=response[2]
+        response = grpcclient.get_url(
+            {"usecase_id": usecase_id, "cameraid": cameraid, "image": frame, "bboxes": bboxes}
+        )
+        features = response[2]
         # print("====grpc execution done")
 
-        #features = self.encoder.encode(frame, bboxes)
+        # features = self.encoder.encode(frame, bboxes)
 
         dets = []
         for bbox_id, bbox in enumerate(bboxes):

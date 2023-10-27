@@ -6,24 +6,29 @@ from google.protobuf import descriptor as _descriptor
 from google.protobuf import descriptor_pool as _descriptor_pool
 from google.protobuf import symbol_database as _symbol_database
 from google.protobuf.internal import builder as _builder
+
 # @@protoc_insertion_point(imports)
 
 _sym_db = _symbol_database.Default()
 
 
-
-
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0ftrackgrpc.proto\x12\x0ctrackgrpcpkg\"Q\n\x0cTrackRequest\x12\x12\n\nusecase_id\x18\x01 \x01(\t\x12\x10\n\x08\x63\x61meraid\x18\x02 \x01(\t\x12\r\n\x05image\x18\x03 \x01(\t\x12\x0c\n\x04\x62\x62ox\x18\x04 \x01(\x0c\"F\n\rTrackResponse\x12\x12\n\nusecase_id\x18\x01 \x01(\t\x12\x10\n\x08\x63\x61meraid\x18\x02 \x01(\t\x12\x0f\n\x07\x66\x65\x61ture\x18\x03 \x01(\x0c\x32L\n\x05track\x12\x43\n\x08gettrack\x12\x1a.trackgrpcpkg.TrackRequest\x1a\x1b.trackgrpcpkg.TrackResponseb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(
+    b'\n\x0ftrackgrpc.proto\x12\x0ctrackgrpcpkg"Q\n\x0cTrackRequest\x12\x12\n\nusecase_id\x18\x01'
+    b" \x01(\t\x12\x10\n\x08\x63\x61meraid\x18\x02 \x01(\t\x12\r\n\x05image\x18\x03"
+    b' \x01(\t\x12\x0c\n\x04\x62\x62ox\x18\x04 \x01(\x0c"F\n\rTrackResponse\x12\x12\n\nusecase_id\x18\x01'
+    b" \x01(\t\x12\x10\n\x08\x63\x61meraid\x18\x02 \x01(\t\x12\x0f\n\x07\x66\x65\x61ture\x18\x03"
+    b" \x01(\x0c\x32L\n\x05track\x12\x43\n\x08gettrack\x12\x1a.trackgrpcpkg.TrackRequest\x1a\x1b.trackgrpcpkg.TrackResponseb\x06proto3"
+)
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
-_builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'trackgrpc_pb2', _globals)
+_builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, "trackgrpc_pb2", _globals)
 if _descriptor._USE_C_DESCRIPTORS == False:
-  DESCRIPTOR._options = None
-  _globals['_TRACKREQUEST']._serialized_start=33
-  _globals['_TRACKREQUEST']._serialized_end=114
-  _globals['_TRACKRESPONSE']._serialized_start=116
-  _globals['_TRACKRESPONSE']._serialized_end=186
-  _globals['_TRACK']._serialized_start=188
-  _globals['_TRACK']._serialized_end=264
+    DESCRIPTOR._options = None
+    _globals["_TRACKREQUEST"]._serialized_start = 33
+    _globals["_TRACKREQUEST"]._serialized_end = 114
+    _globals["_TRACKRESPONSE"]._serialized_start = 116
+    _globals["_TRACKRESPONSE"]._serialized_end = 186
+    _globals["_TRACK"]._serialized_start = 188
+    _globals["_TRACK"]._serialized_end = 264
 # @@protoc_insertion_point(module_scope)

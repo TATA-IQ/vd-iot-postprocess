@@ -68,8 +68,6 @@
 #     return image
 
 
-
-
 # '''
 # class ImageEncoder(object):
 
@@ -103,7 +101,7 @@
 #         self.image_encoder = image_encoder
 #         #ImageEncoder(model_filename, input_name, output_name)
 #         self.image_shape = self.image_encoder.image_shape
-        
+
 #         self.batch_size=batch_size
 
 #     def encode(self,image,boxes):

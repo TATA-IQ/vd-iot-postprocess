@@ -28,8 +28,8 @@ class Detection(object):
 
     def __init__(self, tlwh, confidence, feature):
         self.tlwh = np.asarray(tlwh, dtype=float)
-        #self.confidence = float(confidence)
-        self.confidence=0.8
+        # self.confidence = float(confidence)
+        self.confidence = 0.8
         self.feature = np.asarray(feature, dtype=np.float32)
 
     def to_tlbr(self):
