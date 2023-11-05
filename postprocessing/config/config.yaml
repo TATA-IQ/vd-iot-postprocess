@@ -16,3 +16,8 @@ kafka:
   - 172.16.0.171:9092
   - 172.16.0.174:9092
 
+tracking_server:
+  host: "localhost"
+  port: "50051"
+
+

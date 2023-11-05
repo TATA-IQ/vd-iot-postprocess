@@ -116,7 +116,7 @@ class SVDTemplate(Template, Caching):
                     ]
                 )
 
-    def process_steps(self):
+    def process_steps(self,logger):
         print("=====template step proces=====")
         steps_keys = list(map(lambda x: int(x), list(self.steps.keys())))
         steps_keys.sort()

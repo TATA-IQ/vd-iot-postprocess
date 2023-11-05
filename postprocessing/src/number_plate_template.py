@@ -26,13 +26,14 @@ class NumberPlateTemplate:
         # self.model_urls.append(url)
         print("=======Api Calling=====", url)
         try:
+            # print(requestparams)
             response = requests.post(url, json=requestparams)
             # current_time=datetime.utcnow()
 
             # time_diff=(current_time-self.image_time).total_seconds()
             # self.logger.info(f"{self.usecase_id}, {self.camera_id}, model response time, {time_diff}")
             print("=====model result NP=====")
-            print(response.json())
+            #print(response.json())
             return response
         except Exception as ex:
             print("=====url======")
@@ -47,11 +48,13 @@ class NumberPlateTemplate:
         requestparams = self.create_request_np(image_str, npcords, step["model_type"], step["model_framework"])
         print("====calling api=====")
         response = self.api_call_np(url, requestparams)
-        if response is not None and response.status_code == 200:
+        if response is not None:
             data = response.json()["data"]
+            print("=====number plate response====")
+            #print(data)
             return data
         else:
-            return None
+            return []
 
     def overlap(self, Xmin, Ymin, Xmax, Ymax, Xmin1, Ymin1, Xmax1, Ymax1):
         if Xmin > Xmax1 or Xmin1 > Xmax or Ymin > Ymax1 or Ymin1 > Ymax:
@@ -63,13 +66,13 @@ class NumberPlateTemplate:
     def find_vehicle(self, vehicle_detction, np_detection):
         listres = []
         print("========Number Plate Vehicle Call====")
-
-        for vech in vehicle_detction:
+        allindex=[]
+        commonindex=[]
+        for idx,vech in enumerate(vehicle_detction):
+            allindex.append(idx)
             for np in np_detection:
                 if "text" in np:
-                    print("))))))))")
-                    print(np)
-                    print(vech)
+                    
                     ovlp = self.overlap(
                         vech["xmin"],
                         vech["ymin"],
@@ -82,24 +85,28 @@ class NumberPlateTemplate:
                     )
                     print(ovlp)
                     if ovlp >= 90:
+                        commonindex.append(idx)
                         vech[vech["class_name"]] = np["text"]
                         listres.append(vech)
                         break
                     else:
                         pass
-            listres.append(vech)
-
+            
+            #listres.append(vech)
+        
+        commonindex=list(set(commonindex))
+        listres=[vehicle_detction[i] for i in commonindex]
         return listres
 
     def process_np(self, vehicle_detction, np_detection, step):
-        imagelist = []
+        #imagelist = []
         listresult = []
         np_output = []
         carwithNp = []
         npcords = {}
         print("Number plate Process")
 
-        for idx, stp in enumerate(step):
+        for  stp in step:
             step_process = step[stp]
             print(stp)
             print("==step processs============")
@@ -116,13 +123,13 @@ class NumberPlateTemplate:
                     xmax = det["xmax"]
                     ymax = det["ymax"]
                     np_image = self.frame[ymin:ymax, xmin:xmax]
-                    cv2.imwrite("np/" + self.image_name, np_image)
+                    #cv2.imwrite("np/" + self.image_name, np_image)
                     # np_image_str=cv2.imencode(".jpg", np_image)[1].tobytes().decode("ISO-8859-1")
                     npcords[ix + 1] = [xmin, ymin, xmax, ymax]
                 print("====npcords===>", npcords)
 
                 np_output = self.np_model_call(npcords, step_process)
-                print(np_output)
+                # print(np_output)
         for det, np in zip(np_detection, np_output):
             if "np" in np:
                 det["text"] = np["np"]

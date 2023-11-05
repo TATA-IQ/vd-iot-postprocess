@@ -9,3 +9,4 @@ class Query(BaseModel):
     postprocess_config: Union[dict, None] = None
     topic_name: Union[str, None] = None
     metadata: Union[dict, None] = None
+    boundary_config: Union[dict, None] = None

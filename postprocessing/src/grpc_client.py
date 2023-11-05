@@ -8,9 +8,9 @@ class GRPCClient(object):
     GRPC Client for Encoder image in Tensorflow
     """
 
-    def __init__(self):
-        self.host = "localhost"
-        self.server_port = 50051
+    def __init__(self,host,port):
+        self.host = host
+        self.server_port = port
 
         # instantiate a channel
         self.channel = grpc.insecure_channel("{}:{}".format(self.host, self.server_port))

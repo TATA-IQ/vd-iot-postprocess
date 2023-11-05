@@ -69,19 +69,19 @@ def submit_task(postprocess, kafkahost,logger):
             data = queue_image.get()
             # print("===got data===",data)
 
-            postprocess.initialize(data[0], data[1], data[2], data[3], producer,logger)
-            postprocess.process()
+            #postprocess.initialize(data[0], data[1], data[2], data[3], producer,logger)
+            postprocess.process(data[0], data[1], data[2], data[3],data[4] ,producer)
             # postprocess.process(data[0],data[1],data[2],data[3])
         # else:
         # 	print("queue seems to be empty")
 
 
-def process_queue(kafkahost,logger):
+def process_queue(kafkahost,tracking_server,logger):
     '''
     Submit Task for the upcoming request from preprocess module
     '''
     print("====starting queue====")
-    postprocess = PostProcessingApp(r_con, logger)
+    postprocess = PostProcessingApp(r_con,tracking_server, logger)
     with ThreadPoolExecutor(max_workers=10) as executor:
         for i in range(0,10):
             # lock.acquire()
@@ -97,7 +97,7 @@ async def process_image(data: Query):
     data (Query): Query from the api
     '''
     print("Imagr got")
-    queue_image.put([data.image, data.postprocess_config, data.topic_name, data.metadata])
+    queue_image.put([data.image, data.postprocess_config, data.topic_name, data.metadata,data.boundary_config])
     return {"data": ["image pushed"]}
     # postprocess=PostProcessingApp(data.image,data.postprocess_config,data.topic_name,data.metadata)
     # postprocess.process(r_con)
@@ -118,6 +118,7 @@ if __name__ == "__main__":
     logg = create_rotating_log("logs/logs.log")
     data = Config.yamlconfig("config/config.yaml")
     kafkahost = data[0]["kafka"]
+    tracking_server=data[0]["tracking_server"]
     tracker_smd = SharedMemoryDict(name="tracking", size=10000000)
     tracker_smd.shm.close()
     tracker_smd.shm.unlink()  # Free and release the shared memory block at the very end
@@ -130,7 +131,7 @@ if __name__ == "__main__":
             
             print("f1====")
             for i in range(0,5):
-                f1 = executor.submit(process_queue, kafkahost,logger)
+                f1 = executor.submit(process_queue, kafkahost,tracking_server,logger)
                 f1.add_done_callback(future_callback_error_logger)
             
         except KeyboardInterrupt:

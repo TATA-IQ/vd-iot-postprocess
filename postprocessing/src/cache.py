@@ -30,6 +30,7 @@ class Caching:
         try:
             print("=====cache storing===")
             self.rcon.set(key + "_" + str(camera_id) + "_" + str(usecase_id), json.dumps(data), ex=60)
+            print("========cache stored=========")
         except Exception as ex:
             print("exception while saving: ", ex)
 

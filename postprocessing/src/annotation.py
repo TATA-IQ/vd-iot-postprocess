@@ -6,7 +6,7 @@ from datetime import datetime
 import cv2
 import numpy as np
 from PIL import ImageColor
-
+import copy
 
 class AnnotateImage:
     def __init__(self, expected_class, detected_class, frame, misc_data=None):
@@ -33,7 +33,7 @@ class AnnotateImage:
         legend = np.full(shape=(h, int(0.2 * w), c), fill_value=255, dtype=self.frame.dtype)
         return legend
 
-    def external_legend(self, frame):
+    def external_legend(self, frame,expected_classes,detected_class):
         '''
         Mark external legend on image
         Args:
@@ -42,18 +42,19 @@ class AnnotateImage:
             frame (np.array):  numpy array
         '''
         h, w, c = frame.shape
+        FONT_SCALE = 0.5
         legend = self.create_legend()
         frame = cv2.hconcat([frame, legend])
-        totaldetected_class = len(self.detected_class)
+        totaldetected_class = len(detected_class)
         pixeldiff_h, pixeldiff_w, pixeldiff_c = frame.shape
         start_pixel_h = 30
-        class_ids = [i["class_id"] for i in self.expected_class]
+        class_ids = [i["class_id"] for i in expected_classes]
         # start_pixel_w=pixeldiff_w-int(0.2*w)+10
         track_name_list = []
         np_list = []
         present_class_id = []
         present_class_name = []
-        for det in self.detected_class:
+        for det in detected_class:
             # print("===annot detect===")
             try:
                 class_id = det["class_id"]
@@ -65,44 +66,45 @@ class AnnotateImage:
             # print("======")
             # print(class_ids.index(int(class_id)))
             # print("+++++")
-            expected_class = self.expected_class[class_ids.index(int(class_id))]
+            expected_class = expected_classes[class_ids.index(int(class_id))]
             # print("===got exected class====")
             # frame=cv2.putText(frame,det["class_name"],org=(start_pixel_w,start_pixel_h),
             # fontFace = cv2.FONT_HERSHEY_SIMPLEX, fontScale=0.5,color=ImageColor.getcolor(expected_class["text_color"], "RGB"),
             # thickness=3)
             # cv2.imwrite("font.jpg",frame)
-
-            # frame=cv2.circle(frame,( start_pixel_w+70, start_pixel_h-3),5, ImageColor.getcolor(expected_class["bound_color"], "RGB"), cv2.FILLED)
+            width = int(det["xmax"]) - int(det["xmin"])
+            height = int(det["ymax"]) - int(det["ymin"])
+            # frame=cv2.circle(frame,( start_pixel_w+70, start_pixel_h-3),5, ImageColor.getcolor(expected_class["bound_color"], "RGB")[::-1], cv2.FILLED)
             frame = cv2.rectangle(
                 frame,
                 (det["xmin"], det["ymin"]),
                 (det["xmax"], det["ymax"]),
-                color=ImageColor.getcolor(expected_class["bound_color"], "RGB"),
+                color=ImageColor.getcolor(expected_class["bound_color"], "RGB")[::-1],
                 thickness=expected_class["bound_thickness"],
             )
-            if det["class_name"] in det:
+            if det["class_name"] in det and type(det[det["class_name"]])== type('abc'):
                 cv2.rectangle(
                     frame,
                     (det["xmin"], det["ymin"]),
                     (det["xmin"] + (det["xmax"] - det["xmin"]), det["ymin"] - 30),
-                    color=ImageColor.getcolor(expected_class["bound_color"], "RGB"),
-                    thickness=-1,
+                    color=ImageColor.getcolor(expected_class["bound_color"], "RGB")[::-1],
+                    thickness=1,
                 )
                 cv2.putText(
                     frame,
                     str(det[det["class_name"]]),
                     (int(det["xmin"]), int(det["ymin"])),
                     cv2.FONT_HERSHEY_SIMPLEX,
-                    0.5,
+                     0.5,
                     (0, 0, 0),
-                    2,
+                    thickness=expected_class["text_thickness"]
                 )
             if "speed" in det:
                 cv2.rectangle(
                     frame,
                     (det["xmin"], det["ymin"]),
                     (det["xmin"] + (det["xmax"] - det["xmin"]), det["ymin"] - 30),
-                    color=ImageColor.getcolor(expected_class["bound_color"], "RGB"),
+                    color=ImageColor.getcolor(expected_class["bound_color"], "RGB")[::-1],
                     thickness=-1,
                 )
                 cv2.putText(
@@ -110,9 +112,9 @@ class AnnotateImage:
                     str(det["speed"]),
                     (int(det["xmin"]), int(det["ymin"])),
                     cv2.FONT_HERSHEY_SIMPLEX,
-                    0.5,
+                     0.5,
                     (0, 0, 0),
-                    2,
+                    thickness=expected_class["text_thickness"]
                 )
 
             present_class_id.append(class_id)
@@ -132,7 +134,7 @@ class AnnotateImage:
                 frame,
                 (start_pixel_w, start_pixel_h),
                 5,
-                ImageColor.getcolor(expected_class["bound_color"], "RGB"),
+                ImageColor.getcolor(expected_class["bound_color"], "RGB")[::-1],
                 cv2.FILLED,
             )
             frame = cv2.putText(
@@ -141,14 +143,14 @@ class AnnotateImage:
                 org=(start_pixel_w + 10, start_pixel_h),
                 fontFace=cv2.FONT_HERSHEY_SIMPLEX,
                 fontScale=0.5,
-                color=ImageColor.getcolor(expected_class["text_color"], "RGB"),
-                thickness=3,
+                color=(0,0,0),
+                thickness=2,
             )
             # print("======annot3=====")
             start_pixel_h = start_pixel_h + 40
         return frame
 
-    def internal_legend(self, frame):
+    def internal_legend(self, frame,expected_classes,detected_class):
         '''
         Annotate internally on image
         Args:
@@ -156,15 +158,15 @@ class AnnotateImage:
         returns:
             frame (np.array):  numpy array
         '''
-        print("====internal legend=======")
+        # print("====internal legend=======")
         FONT_SCALE = 0.5
         try:
             # print("====class id====")
-            class_ids = [i["class_id"] for i in self.expected_class]
+            class_ids = [i["class_id"] for i in expected_classes]
             # ids=[i["id"] for i in self.expected_class ]
             # print("=======det====")
-            print(self.detected_class)
-            for det in self.detected_class:
+            # print(self.detected_class)
+            for det in detected_class:
                 # print(det)
                 x1 = det["xmin"]
                 y1 = det["ymin"]
@@ -176,27 +178,31 @@ class AnnotateImage:
                 height = int(y2) - int(y1)
                 class_id = det["class_id"]
                 # print("=======expected====")
-                expected_class = self.expected_class[class_id.index(str(class_id))]
+                expected_class = expected_classes[class_id.index(str(class_id))]
 
                 # overlap = output[i]["overlap"]
                 # print("=======annotation====")
+                print("====Image color====")
+                print(class_name, det["id"])
+                print(ImageColor.getcolor(expected_class["bound_color"], "RGB")[::-1])
 
                 frame = cv2.rectangle(
                     frame,
                     (int(x1), int(y1)),
                     (int(x2), int(y2)),
-                    color=ImageColor.getcolor(expected_class["bound_color"], "RGB"),
+                    color=ImageColor.getcolor(expected_class["bound_color"], "RGB")[::-1],
                     thickness=expected_class["text_thickness"],
                 )
                 # cv2.rectangle(image, (int(x1), int(y1)), (int(x1)+(int(x2) - int(x1)), int(y1) - 10), color=color_code[class_name],
                 #             thickness=-1)
                 # print("=====text========")
-                if det["id"] is not None:
+                if det["id"] is  None:
+                    
                     cv2.rectangle(
                         frame,
                         (int(x1), int(y1)),
-                        (int(x1) + (int(x2) - int(x1)), int(y1) - 10),
-                        color=ImageColor.getcolor(expected_class["bound_color"], "RGB"),
+                        (int(x1) + (int(x2) - int(x1)), int(y1) - 30),
+                        color=ImageColor.getcolor(expected_class["bound_color"], "RGB")[::-1],
                         thickness=-1,
                     )
                     frame = cv2.putText(
@@ -204,60 +210,60 @@ class AnnotateImage:
                         class_name,
                         (int(x1), int(y1)),
                         cv2.FONT_HERSHEY_SIMPLEX,
-                        min(width, height) * FONT_SCALE * 10,
-                        color=ImageColor.getcolor(expected_class["bound_color"], "RGB"),
-                        thickness=expected_class["bound_thickness"],
+                        0.5,
+                        color=ImageColor.getcolor(expected_class["text_color"], "RGB")[::-1],
+                        thickness=1
                     )
                 else:
                     cv2.rectangle(
                         frame,
                         (int(x1), int(y1)),
-                        (int(x1) + (int(x2) - int(x1)), int(y1) - 10),
-                        color=ImageColor.getcolor(expected_class["bound_color"], "RGB"),
+                        (int(x1) + (int(x2) - int(x1)), int(y1) - 30),
+                        color=ImageColor.getcolor(expected_class["bound_color"], "RGB")[::-1],
                         thickness=-1,
                     )
                     frame = cv2.putText(
                         frame,
-                        class_name + "_" + str(det["id"]),
+                        class_name ,
                         (int(x1), int(y1)),
                         cv2.FONT_HERSHEY_SIMPLEX,
-                        min(width, height) * FONT_SCALE * 10,
-                        color=ImageColor.getcolor(expected_class["bound_color"], "RGB"),
-                        thickness=expected_class["bound_thickness"],
+                        0.5,
+                        color=ImageColor.getcolor(expected_class["text_color"], "RGB")[::-1],
+                        thickness=1
                     )
-                if det["class_name"] in det and len(det[det["class_name"]]) > 0:
-                    cv2.rectangle(
-                        frame,
-                        (det["xmin"], det["ymin"]),
-                        (det["xmin"] + (det["xmax"] - det["xmin"]), det["ymin"] - 30),
-                        color=ImageColor.getcolor(expected_class["bound_color"], "RGB"),
-                        thickness=-1,
-                    )
+                if det["class_name"] in det and  type(det[det["class_name"]])== type('abc') and len(det[det["class_name"]]) > 0:
+                    # cv2.rectangle(
+                    #     frame,
+                    #     (det["xmin"], det["ymin"]),
+                    #     (det["xmin"] + (det["xmax"] - det["xmin"]), det["ymin"] - 30),
+                    #     color=ImageColor.getcolor(expected_class["bound_color"], "RGB")[::-1],
+                    #     thickness=-1,
+                    # )
                     cv2.putText(
                         frame,
                         str(det[det["class_name"]]),
-                        (int(det["xmin"]), int(det["ymin"])),
+                        (int(x1)+20, int(y1)),
                         cv2.FONT_HERSHEY_SIMPLEX,
-                        0.5,
-                        (0, 0, 0),
-                        2,
+                        fontScale=0.5,
+                color=ImageColor.getcolor(expected_class["text_color"], "RGB")[::-1],
+                thickness=2
                     )
                 if "speed" in det:
-                    cv2.rectangle(
-                        frame,
-                        (det["xmin"], det["ymin"]),
-                        (det["xmin"] + (det["xmax"] - det["xmin"]), det["ymin"] - 30),
-                        color=ImageColor.getcolor(expected_class["bound_color"], "RGB"),
-                        thickness=-1,
-                    )
+                    # cv2.rectangle(
+                    #     frame,
+                    #     (det["xmin"], det["ymin"]),
+                    #     (det["xmin"] + (det["xmax"] - det["xmin"]), det["ymin"] - 30),
+                    #     color=ImageColor.getcolor(expected_class["bound_color"], "RGB")[::-1],
+                    #     thickness=-1,
+                    # )
                     cv2.putText(
                         frame,
                         str(det["speed"]),
-                        (int(det["xmin"]), int(det["ymin"])),
+                        (int(x1)+40, int(y1)),
                         cv2.FONT_HERSHEY_SIMPLEX,
-                        0.5,
-                        (0, 0, 0),
-                        2,
+                        fontScale=0.5,
+                color=(0,0,0),
+                thickness=2,
                     )
 
                 # cv2.imwrite("annot_frame/"+str(datetime.utcnow())+".jpg",frame)
@@ -265,7 +271,7 @@ class AnnotateImage:
             print("Exception while annotation===>", ex)
         return frame
 
-    def annotate_computation(self, frame):
+    def annotate_computation(self, frame,misc_data):
         '''
         Anntate computation image
         Args:
@@ -273,12 +279,14 @@ class AnnotateImage:
         returns:
             frame (np.array):  numpy array
         '''
+        
         x1 = 10
         width, height, _ = frame.shape
-        y1 = 10
+        y1 = 30
         fontScale = 0.005
-        if self.misc_data is not None:
-            for i in self.misc_data:
+        print("======+++++misc___annotate",misc_data)
+        if misc_data is not None:
+            for i in misc_data:
                 y1 = y1 + int(0.05 * width)
 
                 frame = cv2.putText(
@@ -288,7 +296,7 @@ class AnnotateImage:
                     cv2.FONT_HERSHEY_SIMPLEX,
                     int(min(width, height) * fontScale) + 1,
                     color=(255, 0, 0),
-                    thickness=4,
+                    thickness=2,
                 )
                 # cv2.imwrite("abc.jpg",frame)
         return frame
@@ -301,21 +309,25 @@ class AnnotateImage:
         returns:
             frame (np.array): numpy array
         '''
-        print("====annotation called===")
+        # print("====annotation called===")
         frame = np.copy(self.frame)
-        frame = self.annotate_computation(frame)
+        misc_data=copy.deepcopy(self.misc_data)
+        expected_classes=copy.deepcopy(self.expected_class)
+        detected_class=copy.deepcopy(self.detected_class)
+        frame = self.annotate_computation(frame,misc_data)
 
         # h,w,c=frame.shape
         if len(self.detected_class) > 0:
             # frame=self.external_legend(frame)
             try:
                 if int(legend_state) == 1:
-                    print("====exter legend====")
-                    frame = self.external_legend(frame)
+                    # print("====exter legend====")
+                    frame = self.external_legend(frame,expected_classes,detected_class)
                 else:
-                    print("====internal legend====")
-                    frame = self.internal_legend(frame)
+                    # print("====internal legend====")
+                    frame = self.internal_legend(frame,expected_classes,detected_class)
             except:
-                print("====internal legend exceptions====")
-                frame = self.internal_legend(frame)
+                # print("====internal legend exceptions====")
+                frame = self.internal_legend(frame,expected_classes,detected_class)
+        del self.expected_class, self.detected_class,self.misc_data, misc_data,expected_classes,detected_class
         return frame

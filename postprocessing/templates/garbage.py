@@ -1,3 +1,6 @@
+"""
+Garbage Template
+"""
 from src.cache import Caching
 from src.common_template import Template
 from src.compute import Computation
@@ -21,6 +24,23 @@ class GarbageTemplate(Template, Caching, IncidentExtract, PostProcessing):
         mask=None,
         image_back=None,
     ):
+        """
+        Garbage Template Initilization
+        Args:
+            image (str): image in string
+            image_name (str): name of image
+            camera_id (str): camera id
+            image_time (str): time of image captured
+            steps (dict): all the steps of usecase
+            frame (np.array): image as numpy array
+            incidents (list): incidents list of usecase
+            usecase_id (str or int): usecase id
+            tracker (object): tracker object
+            rcon (object): redis connection
+            mask (np.array): mask image 1
+            image_back (np.array): mask image2
+
+        """
         print("====Initializing crowd=====")
         self.frame = image
         self.allsteps = steps
@@ -38,14 +58,27 @@ class GarbageTemplate(Template, Caching, IncidentExtract, PostProcessing):
             data = self.getbykey("garbage", self.camera_id, self.usecase_id)
             if data is None:
                 self.initialize_cache()
+                incident_cache= self.getbykey("incident_garbage", self.camera_id, self.usecase_id)
+                if incident_cache is None:
+                    self.initialize_incident_cache()
 
     def initialize_cache(self):
+        """
+        cache initialization
+        """
         cachedict = {}
         cachedict["detections"] = []
 
         self.setbykey("garbage", self.camera_id, self.usecase_id, cachedict)
 
     def set_cache(self, currentdata, cachedict):
+        '''
+        Store data to cache
+        Args:
+            currentdata (dict): current frame detection
+            cachedict (list): cache data
+
+        '''
         if cachedict is not None:
             if len(cachedict["detections"]) > 9:
                 print(len(cachedict))
@@ -60,8 +93,57 @@ class GarbageTemplate(Template, Caching, IncidentExtract, PostProcessing):
             cachedict["detections"] = []
             cachedict["detections"].insert(0, currentdata)
         self.setbykey("garbage", self.camera_id, self.usecase_id, cachedict)
+    def initialize_incident_cache(self):
+        """
+        cache initialization incident
+        """
+        cachedict = {}
+
+        cachedict["incidents"] = []
+        self.setbykey("incident_garbage", self.camera_id, self.usecase_id, cachedict)
+        print("======cache initialized====")
+
+    def set_cache_incident(self,  cachedict,currentdata):
+        '''
+        Store data to cache incident
+        Args:
+            currentdata (dict): current frame detection
+            cachedict (list): cache data
+
+        '''
+        print("===Storing in cache====")
+        print(cachedict)
+        print(currentdata)
+        if len(cachedict["incidents"])>0 :
+            if len(cachedict["incidents"]) > 10:
+                print(len(cachedict))
+                for i in range(9, len(cachedict["incidents"])):
+                    cachedict["incidents"].pop()
+
+                cachedict["incidents"].insert(0, currentdata)
+            else:
+                print("=====storing cachedict======")
+                cachedict["incidents"].insert(0, currentdata)
+        else:
+            cachedict = {}
+            cachedict["incidents"] = []
+            print("===Storing firsr data cache====")
+
+            cachedict["incidents"].insert(0, currentdata)
+        # print("***********")
+        # print(cachedict)
+        self.setbykey("incident_garbage", self.camera_id, self.usecase_id, cachedict)
+
+
+
 
     def process_steps(self):
+        '''
+        Process the steps of usecase id
+        returns :
+            final_prediction (dict): filtered result based on preprocessing
+            masked_image (dict): numpy array image
+        '''
         final_prediction = {}
         masked_image = None
         steps_keys = list(map(lambda x: int(x), list(self.steps.keys())))
@@ -98,16 +180,28 @@ class GarbageTemplate(Template, Caching, IncidentExtract, PostProcessing):
                 print(final_prediction)
         return final_prediction, masked_image
 
-    def process_data(self):
+    def process_data(self,logger):
+        '''
+        Process Garbage Template
+        Args:
+            logger (object): Logger object
+        returns:
+            detection_data (list): list of detection data
+            incident_dict (list): list of incident data
+            self.expected_class (list): list of expected class
+            masked_image (np.array): masked image as numpy array
+        '''
         detection_incidentflag = {}
         incident_dict = []
         detection_data = []
         print("==============Data==========")
         filtered_res_dict = {}
         filtered_res_dict["prediction_class"] = []
+        all_detections={}
+        all_detections["prediction_class"]=[]
         print("=======caleed Garbage detection=====")
         # self.detection_init(self.detected_class,self.expected_class,self.image_time)
-        filtered_res_dict, masked_image = self.process_steps()
+        all_detections, masked_image = self.process_steps()
         print("**********filtered dic******")
         print(filtered_res_dict)
 
@@ -120,12 +214,13 @@ class GarbageTemplate(Template, Caching, IncidentExtract, PostProcessing):
         print(filtered_res_dict)
         if cachedict is None or len(cachedict) == 0:
             self.initialize_cache()
+            filtered_res_dict=all_detections
         else:
             print("======postprocessing called======")
             print(cachedict)
             print(filtered_res_dict)
 
-            PostProcessing.__init__(self, filtered_res_dict, cachedict["detections"])
+            PostProcessing.__init__(self, all_detections, cachedict["detections"])
             filtered_res_dict["prediction_class"], _ = self.filter_data_detection()
         print("=======filtering======")
         if "prediction_class" in filtered_res_dict:
@@ -138,7 +233,14 @@ class GarbageTemplate(Template, Caching, IncidentExtract, PostProcessing):
         print(len(detection_data))
         print("*******fil*********")
         print(filtered_res_dict)
+        if len(incident_dict)>0:
+            print("====len of incident before filter====",len(incident_dict))
+            cachedict_incident=self.getbykey("incident_garbage", self.camera_id, self.usecase_id)
+            incident_dict,current_incidents=self.filter_base_incidents(cachedict_incident,incident_dict)
+            
+            self.set_cache_incident(cachedict_incident,current_incidents)
+            print("====len of incident after filter====",len(incident_dict))
         if "prediction_class" in filtered_res_dict and len(filtered_res_dict["prediction_class"]) > 0:
-            self.set_cache(detection_incidentflag, cachedict)
+            self.set_cache(all_detections, cachedict)
 
         return detection_data, incident_dict, self.expected_class, masked_image

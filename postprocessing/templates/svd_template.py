@@ -11,12 +11,30 @@ from src.compute import Computation
 from src.incidents import IncidentExtract
 from src.number_plate_template import NumberPlateTemplate
 from src.template_tracking import TemplateTracking
+from PIL import ImageColor
 
 
 class SVDTemplate(Template, Caching, IncidentExtract):
     def __init__(
-        self, image, image_name, camera_id, image_time, steps, frame, incidents, usecase_id, tracker=None, rcon=None
+        self, image, image_name, camera_id, image_time, steps, frame, incidents, usecase_id, boundary_config ,tracker=None, rcon=None
     ):
+        """
+        SVD Template Initilization
+        Args:
+            image (str): image in string
+            image_name (str): name of image
+            camera_id (str): camera id
+            image_time (str): time of image captured
+            steps (dict): all the steps of usecase
+            frame (np.array): image as numpy array
+            incidents (list): incidents list of usecase
+            usecase_id (str or int): usecase id
+            tracker (object): tracker object
+            rcon (object): redis connection
+            mask (np.array): mask image 1
+            image_back (np.array): mask image2
+
+        """
         print("====Initializing SVD=====")
         self.rcon = rcon
         self.usecase_id = usecase_id
@@ -28,7 +46,21 @@ class SVDTemplate(Template, Caching, IncidentExtract):
         self.rcon = rcon
         self.image_time = image_time
         self.cache_data = None
-        self.y_l1, self.y_l2 = 360, 420  # 800 ,1000#800 ,1000#920 ,1200#412, 670
+        cordkey=list(boundary_config.keys())
+        image_height=int(boundary_config[cordkey[0]]["image_height"])
+        image_width=int(boundary_config[cordkey[0]]["image_width"])
+        self.color_l1=boundary_config[cordkey[0]]["color"]
+        self.color_l2=boundary_config[cordkey[-1]]["color"]
+        fr_h,fr_w,_c=frame.shape
+        #self.y_l1, self.y_l2 = 360, 420  # 800 ,1000#800 ,1000#920 ,1200#412, 670
+        print("=====keys====")
+        self.y_l1, self.y_l2=int(boundary_config[cordkey[0]]["boundary_coordinates"]["y"][0]),int(boundary_config[cordkey[-1]]["boundary_coordinates"]["y"][-1])
+        print("=======y1=====",self.y_l1)
+        print("=======y2=====",self.y_l2)
+        self.y_l1=int((self.y_l1/image_height)*fr_h)
+        self.y_l2=int((self.y_l2/image_height)*fr_h)
+        print("=======y1 after change=====",self.y_l1)
+        print("=======y2 after change=====",self.y_l2)
         Template.__init__(self, image, image_name, camera_id, image_time, steps, frame)
         if self.rcon is not None:
             print("=======cahching initialization=====")
@@ -82,9 +114,11 @@ class SVDTemplate(Template, Caching, IncidentExtract):
         # line between line 1 and line 3
         y_2 = int((self.y_l1 + self.y_l2) // 2)
         y_2 = max(0, min(frame_height - 1, y_2))
-        cv2.line(frame, (0, y_1), (frame_width, y_1), color=(0, 255, 0), thickness=2)
+        print("=========color l1=====",self.color_l1)
+        print("=========color l1=====",self.color_l2)
+        cv2.line(frame, (0, y_1), (frame_width, y_1), color=ImageColor.getcolor(self.color_l1,"RGB")[::-1], thickness=2)
         cv2.line(frame, (0, y_2), (frame_width, y_2), color=(0, 255, 0), thickness=2)
-        cv2.line(frame, (0, y_3), (frame_width, y_3), color=(0, 255, 0), thickness=2)
+        cv2.line(frame, (0, y_3), (frame_width, y_3), color=ImageColor.getcolor(self.color_l2,"RGB")[::-1], thickness=2)
         line_one_ = [0, y_1, frame_width, y_1]
         line_two_ = [0, y_2, frame_width, y_2]
         line_three_ = [0, y_3, frame_width, y_3]
@@ -105,6 +139,12 @@ class SVDTemplate(Template, Caching, IncidentExtract):
             return "down"
 
     def process_steps(self):
+        '''
+        Process the steps of usecase id
+        returns :
+            final_prediction (dict): filtered result based on preprocessing
+            masked_image (dict): numpy array image
+        '''
         print("=====template step proces=====")
         steps_keys = list(map(lambda x: int(x), list(self.steps.keys())))
         steps_keys.sort()
@@ -162,7 +202,17 @@ class SVDTemplate(Template, Caching, IncidentExtract):
             print("%" * 50)
             return np_plate
 
-    def process_data(self):
+    def process_data(self,logger):
+        '''
+        Process SVD Template
+        Args:
+            logger (object): Logger object
+        returns:
+            detection_data (list): list of detection data
+            incident_dict (list): list of incident data
+            self.expected_class (list): list of expected class
+            masked_image (np.array): masked image as numpy array
+        '''
         print("==============SVD==========")
         filtered_res_dict = []
         detection_incidentflag = {}

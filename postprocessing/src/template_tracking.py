@@ -17,16 +17,24 @@ class TemplateTracking:
         self.grpcclient = grpcclient
 
     def tracking_load(self):
-        if "tracker_" + str(self.usecase_id) + "_" + str(self.camera_id) in tracking_smd:
-            tracker_obj = tracking_smd["tracker_" + str(self.usecase_id) + "_" + str(self.camera_id)]
+        try:
+            if "tracker_" + str(self.usecase_id) + "_" + str(self.camera_id) in tracking_smd:
+                tracker_obj = tracking_smd["tracker_" + str(self.usecase_id) + "_" + str(self.camera_id)]
 
-        else:
+            else:
+                tracker_obj = Tracker()
+        except Exception as ex:
+            print("BBBBBBBB Tracker load exception BBBBBBBB")
             tracker_obj = Tracker()
+
 
         return tracker_obj
 
     def tracking_save(self, tracker_obj):
-        tracking_smd["tracker_" + str(self.usecase_id) + "_" + str(self.camera_id)] = tracker_obj
+        try:
+            tracking_smd["tracker_" + str(self.usecase_id) + "_" + str(self.camera_id)] = tracker_obj
+        except Exception as ex:
+            print("BBBBBBBBB Tracker save exception BBBBBBB")
 
     def track(self, frame, detection_output):
         # print("====inside track======")

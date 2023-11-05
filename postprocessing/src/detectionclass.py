@@ -49,7 +49,7 @@ class DetectionProcess:
             print("lecord:" + str(xmin_l) + ", " + str(ymin_l) + ", " + str(xmax_l) + ", " + str(ymax_l))
             leg_area = np.array([[xmin_l, ymin_l], [xmin_l, ymax_l], [xmax_l, ymax_l], [xmax_l, ymin_l]])
             print("leg area calculate===>", image.shape)
-            image_new = np.zeros([image.shape[0], image.shape[1], 1], dtype=np.uint8)
+            image_new = np.zeros([image.shape[0], image.shape[1],3], dtype=np.uint8)
             print("fill polly===>", image_new.shape)
 
             image_new = cv2.fillPoly(image_new, pts=[leg_area], color=(255, 255, 255))

@@ -1,6 +1,14 @@
 class IncidentExtract:
     def __init__(self, detected_output, incidents, steps):
         # print("======Incident======")
+        self.incident_class_id = []
+        
+
+        self.incident_name = []
+        self.incident_id_list =[]
+        self.incident_class = []
+        self.incident_type_id = []
+        self.incident_type_name =[]
         self.detection_output = detected_output
 
         if "misc" in self.detection_output:
@@ -19,12 +27,24 @@ class IncidentExtract:
         self.incident_values = list(incidents.values())
         print("=====checking incident=====")
         print(self.incident_values)
-        self.incident_class_id = [i["class_id"] for i in self.incident_values]
-        self.incident_name = [i["incident_name"] for i in self.incident_values]
-        self.incident_id_list = [i["incident_id"] for i in self.incident_values]
-        self.incident_class = [i["class_name"] for i in self.incident_values]
-        self.incident_type_id = [i["incident_type_id"] for i in self.incident_values]
-        self.incident_type_name = [i["incident_type_name"] for i in self.incident_values]
+        for i in self.incident_values:
+            for clsid,clsnm in zip(i["class_id"],i["class_name"]):
+                self.incident_class_id.append(clsid)
+                self.incident_class.append(clsnm)
+                self.incident_id_list.append(i["incident_id"])
+                self.incident_name.append(i["incident_name"])
+                self.incident_type_id.append(i["incident_type_id"]) 
+                self.incident_type_name.append(i["incident_type_name"])
+
+
+        # self.incident_class_id = [i["class_id"] for i in self.incident_values]
+        
+
+        # self.incident_name = [i["incident_name"] for i in self.incident_values]
+        # self.incident_id_list = [i["incident_id"] for i in self.incident_values]
+        # self.incident_class = [i["class_name"] for i in self.incident_values]
+        # self.incident_type_id = [i["incident_type_id"] for i in self.incident_values]
+        # self.incident_type_name = [i["incident_type_name"] for i in self.incident_values]
 
     def vehicle_incident_anpr(self):
         print("====calling base incident===")
@@ -53,7 +73,7 @@ class IncidentExtract:
                         "y2": dtdata["ymax"],
                     }
                     print("#####executed4")
-                    incidentdict["misc"] = [{"numberplate": dtdata[dtdata["class_name"]]}]
+                    incidentdict["misc"] = [{"data": dtdata[dtdata["class_name"]],"text":"numberplate"}]
                     print("=============")
                     print(incidentdict)
                     dtdata["incident_status"] = True
@@ -101,7 +121,7 @@ class IncidentExtract:
                     print("#####executed4")
                     incidentdict["misc"] = [{"data": dtdata["speed"], "text": "speed"}]
                     if dtdata[dtdata["class_name"]] in dtdata:
-                        incidentdict["misc"].append({"data": dtdata[dtdata["class_name"]], "text": "nuberplate"})
+                        incidentdict["misc"].append({"data": dtdata[dtdata["class_name"]], "text": "numberplate"})
                     print("=============")
                     print(incidentdict)
                     dtdata["incident_status"] = True
@@ -139,6 +159,12 @@ class IncidentExtract:
                         "y1": dtdata["ymin"],
                         "y2": dtdata["ymax"],
                     }
+                    try:
+                        incidentdict["track_id"]=dtdata["id"]
+                    except KeyError as ex:
+                        incidentdict["track_id"]=None
+                        
+
                     incidentdict["misc"] = []
                     dtdata["incident_status"] = True
                     self.incident_id = self.incident_id + 1
@@ -168,6 +194,10 @@ class IncidentExtract:
                         self.incident_id_list[self.incident_class.index(dtdata["class_name"])]
                     )
                     incidentdict["name"] = self.incident_name[self.incident_class.index(dtdata["class_name"])]
+                    try:
+                        incidentdict["track_id"]=dtdata["id"]
+                    except KeyError as ex:
+                        incidentdict["track_id"]=None
                     incidentdict["coordinate"] = {
                         "x1": dtdata["xmin"],
                         "x2": dtdata["xmax"],
@@ -221,6 +251,9 @@ class IncidentExtract:
         print("*******", idx)
         incidentdict["incident_id"] = int(self.incident_id_list [idx])
         incidentdict["name"] = self.incident_name[idx]
+        
+        incidentdict["track_id"]=None
+        
         incidentdict["coordinate"] = {"x1": "", "x2": "", "y1": "", "y2": ""}
         incidentdict["misc"] = incident_list
         self.incident_id = self.incident_id + 1

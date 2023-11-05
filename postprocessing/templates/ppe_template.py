@@ -1,7 +1,11 @@
+"""
+PPE Template
+"""
 from src.cache import Caching
 from src.common_template import Template
 from src.incidents import IncidentExtract
 from src.postprocessing_template import PostProcessing
+from src.compute import Computation
 
 
 class PPETemplate(Template, Caching, IncidentExtract, PostProcessing):
@@ -20,6 +24,23 @@ class PPETemplate(Template, Caching, IncidentExtract, PostProcessing):
         mask=None,
         image_back=None,
     ):
+        """
+        PPE Template Initilization
+        Args:
+            image (str): image in string
+            image_name (str): name of image
+            camera_id (str): camera id
+            image_time (str): time of image captured
+            steps (dict): all the steps of usecase
+            frame (np.array): image as numpy array
+            incidents (list): incidents list of usecase
+            usecase_id (str or int): usecase id
+            tracker (object): tracker object
+            rcon (object): redis connection
+            mask (np.array): mask image 1
+            image_back (np.array): mask image2
+
+        """
         print("====Initializing crowd=====")
         self.frame = image
         self.allsteps = steps
@@ -37,14 +58,34 @@ class PPETemplate(Template, Caching, IncidentExtract, PostProcessing):
             data = self.getbykey("ppe", self.camera_id, self.usecase_id)
             if data is None:
                 self.initialize_cache()
+            incident_cache= self.getbykey("incident_ppe", self.camera_id, self.usecase_id)
+            if incident_cache is None:
+                self.initialize_incident_cache()
 
     def initialize_cache(self):
+        """
+        cache initialization
+        """
         cachedict = {}
         cachedict["detections"] = []
 
         self.setbykey("ppe", self.camera_id, self.usecase_id, cachedict)
 
     def overlap(self, Xmin, Ymin, Xmax, Ymax, Xmin1, Ymin1, Xmax1, Ymax1):
+        """
+        overlap calculation
+        Args:
+            Xmin (int): xmin of first object
+            Ymin (int): ymin of first object
+            Xmax (int): xmax of first object
+            Ymax (int): ymax of first object
+            Xmin1 (int): xmin of second object
+            Ymin1 (int): xymin of second object
+            Xmax1 (int): xmax of second object
+            Ymax1 (int): ymax of seconf object
+        return:
+            overlap (float): overlap percentage of both object 
+        """
         if Xmin > Xmax1 or Xmin1 > Xmax or Ymin > Ymax1 or Ymin1 > Ymax:
             ov = 0
         else:
@@ -52,6 +93,14 @@ class PPETemplate(Template, Caching, IncidentExtract, PostProcessing):
         return round(100 * ov / ((Xmax1 - Xmin1) * (Ymax1 - Ymin1)), 1)
 
     def check_overlap_classes(self, person_data, data):
+        """
+        check for overlap classes
+        Args:
+            person_data (list): person data from current detection
+            data (list): curnent detection all data
+        
+
+        """
         for dt in data:
             print("=====checking class name====")
             if dt["class_name"] in self.expected_class:
@@ -69,6 +118,15 @@ class PPETemplate(Template, Caching, IncidentExtract, PostProcessing):
                     yield dt
 
     def filter_data(self, detected_data):
+        '''
+        filter data specific to human and ppe detection.
+        For eg-> if vest is detected outside of human bounding box it will be discarded
+        Args:
+            detected_data (list): detection of frame
+        returns:
+            finalresult (list): filtered result
+
+        '''
         finalresult = []
 
         for dt in detected_data:
@@ -80,6 +138,13 @@ class PPETemplate(Template, Caching, IncidentExtract, PostProcessing):
         return finalresult
 
     def set_cache(self, currentdata, cachedict):
+        '''
+        Store data to cache
+        Args:
+            currentdata (dict): current frame detection
+            cachedict (list): cache data
+
+        '''
         if cachedict is not None:
             if len(cachedict["detections"]) > 9:
                 print(len(cachedict))
@@ -94,8 +159,55 @@ class PPETemplate(Template, Caching, IncidentExtract, PostProcessing):
             cachedict["detections"] = []
             cachedict["detections"].insert(0, currentdata)
         self.setbykey("ppe", self.camera_id, self.usecase_id, cachedict)
+    def initialize_incident_cache(self):
+        """
+        cache initialization incident
+        """
+        cachedict = {}
+
+        cachedict["incidents"] = []
+        self.setbykey("incident_ppe", self.camera_id, self.usecase_id, cachedict)
+        print("======cache initialized====")
+
+    def set_cache_incident(self,  cachedict,currentdata):
+        '''
+        Store data to cache incident
+        Args:
+            currentdata (dict): current frame detection
+            cachedict (list): cache data
+
+        '''
+        print("===Storing in cache====")
+        print(cachedict)
+        print(currentdata)
+        if len(cachedict["incidents"])>0 :
+            if len(cachedict["incidents"]) > 10:
+                print(len(cachedict))
+                for i in range(9, len(cachedict["incidents"])):
+                    cachedict["incidents"].pop()
+
+                cachedict["incidents"].insert(0, currentdata)
+            else:
+                print("=====storing cachedict======")
+                cachedict["incidents"].insert(0, currentdata)
+        else:
+            cachedict = {}
+            cachedict["incidents"] = []
+            print("===Storing firsr data cache====")
+
+            cachedict["incidents"].insert(0, currentdata)
+        # print("***********")
+        # print(cachedict)
+        self.setbykey("incident_ppe", self.camera_id, self.usecase_id, cachedict)
+
 
     def process_steps(self):
+        '''
+        Process the steps of usecase id
+        returns :
+            final_prediction (dict): filtered result based on preprocessing
+            masked_image (dict): numpy array image
+        '''
         final_prediction = {}
         masked_image = None
         steps_keys = list(map(lambda x: int(x), list(self.steps.keys())))
@@ -132,16 +244,28 @@ class PPETemplate(Template, Caching, IncidentExtract, PostProcessing):
                 print(final_prediction)
         return final_prediction, masked_image
 
-    def process_data(self):
+    def process_data(self,logger):
+        '''
+        Process PPE Template
+        Args:
+            logger (object): Logger object
+        returns:
+            detection_data (list): list of detection data
+            incident_dict (list): list of incident data
+            self.expected_class (list): list of expected class
+            masked_image (np.array): masked image as numpy array
+        '''
         detection_incidentflag = {}
         incident_dict = []
         detection_data = []
         print("==============Data==========")
         filtered_res_dict = {}
+        all_detections={}
         filtered_res_dict["prediction_class"] = []
+        all_detections["prediction_class"] = []
         print("=======caleed PPE detection=====")
         # self.detection_init(self.detected_class,self.expected_class,self.image_time)
-        filtered_res_dict, masked_image = self.process_steps()
+        all_detections, masked_image = self.process_steps()
         print("**********filtered dic******")
         print(filtered_res_dict)
 
@@ -151,12 +275,13 @@ class PPETemplate(Template, Caching, IncidentExtract, PostProcessing):
         print("=====cachedict====")
         print(cachedict)
         if cachedict is None or len(cachedict) == 0:
-            pass
+            self.initialize_cache()
+            filtered_res_dict=all_detections
         else:
             print("======postprocessing called======")
             print(cachedict)
             print(filtered_res_dict)
-            PostProcessing.__init__(self, filtered_res_dict, cachedict["detections"])
+            PostProcessing.__init__(self, all_detections, cachedict["detections"])
             filtered_res_dict["prediction_class"], _ = self.filter_data_detection()
         print("=======filtering======")
         if "prediction_class" in filtered_res_dict:
@@ -167,7 +292,14 @@ class PPETemplate(Template, Caching, IncidentExtract, PostProcessing):
         print(incident_dict)
         print("=======detection data====")
         print(len(detection_data))
+        if len(incident_dict)>0:
+            print("====len of incident before filter====",len(incident_dict))
+            cachedict_incident=self.getbykey("incident_ppe", self.camera_id, self.usecase_id)
+            incident_dict,current_incidents=self.filter_base_incidents(cachedict_incident,incident_dict)
+            
+            self.set_cache_incident(cachedict_incident,current_incidents)
+            print("====len of incident after filter====",len(incident_dict))
         if len(filtered_res_dict["prediction_class"]) > 0:
-            self.set_cache(detection_incidentflag, cachedict)
+            self.set_cache(all_detections, cachedict)
 
         return detection_data, incident_dict, self.expected_class, masked_image
