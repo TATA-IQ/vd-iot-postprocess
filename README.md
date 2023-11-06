@@ -28,6 +28,7 @@ python3 app.py
 
 # Docker 
 1. Contenirization is enabled
+2. change the config.yaml
 2. Navigate to the Dockerfile level
 2. build the container (sudo docker build -t "postprocess")
 3. Run the container (sudo oocker run -t "postprocess")
