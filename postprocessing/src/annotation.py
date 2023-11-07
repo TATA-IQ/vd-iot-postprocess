@@ -109,8 +109,8 @@ class AnnotateImage:
                 )
                 cv2.putText(
                     frame,
-                    str(det["speed"]),
-                    (int(det["xmin"]), int(det["ymin"])),
+                    str(det["speed"])+" kmph",
+                    (int(det["xmax"])-30, int(det["ymin"])),
                     cv2.FONT_HERSHEY_SIMPLEX,
                      0.5,
                     (0, 0, 0),
@@ -242,7 +242,7 @@ class AnnotateImage:
                     cv2.putText(
                         frame,
                         str(det[det["class_name"]]),
-                        (int(x1)+20, int(y1)),
+                        (int((int(x1)+int(x2))/2), int(y1)),
                         cv2.FONT_HERSHEY_SIMPLEX,
                         fontScale=0.5,
                 color=ImageColor.getcolor(expected_class["text_color"], "RGB")[::-1],
@@ -258,8 +258,8 @@ class AnnotateImage:
                     # )
                     cv2.putText(
                         frame,
-                        str(det["speed"]),
-                        (int(x1)+40, int(y1)),
+                        str(det["speed"])+" kmph",
+                        (int(x2)-30, int(y1)),
                         cv2.FONT_HERSHEY_SIMPLEX,
                         fontScale=0.5,
                 color=(0,0,0),
