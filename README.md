@@ -16,7 +16,7 @@ This is a Postprocessing repo.
 # Dependency
 1. This Module is dependent on the https://tatacommiot@dev.azure.com/tatacommiot/Video%20Based%20IoT/_git/vd-iot-dataapiservice
 2. This module also needs kafka broker
-3. This module will be dependent on various detection service and grpc server(repo is not created yet)
+3. This module will be dependent on various detection service and grpc server(it is available in https://dev.azure.com/tatacommiot/Video%20Based%20IoT/_git/vd-iot-modelvalidation)
 
 # Installation
 1. Install Python3.9 
@@ -27,4 +27,8 @@ This is a Postprocessing repo.
 python3 app.py
 
 # Docker 
-To-do: Docker Implementation
+1. Contenirization is enabled
+2. change the config.yaml
+2. Navigate to the Dockerfile level
+2. build the container (sudo docker build -t "postprocess")
+3. Run the container (sudo docker run -p 8007:8007 -t "postprocess")
