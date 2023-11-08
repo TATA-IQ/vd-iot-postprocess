@@ -31,4 +31,4 @@ python3 app.py
 2. change the config.yaml
 2. Navigate to the Dockerfile level
 2. build the container (sudo docker build -t "postprocess")
-3. Run the container (sudo oocker run -t "postprocess")
+3. Run the container (sudo docker run -p 8007:8007 -t "postprocess")
