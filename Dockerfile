@@ -24,7 +24,6 @@ Run pip install redis==4.6.0
 Run pip install shared-memory-dict==0.7.2
 Run pip install paramiko
 Run pip install grpcio-tools
-Run pip install redis
 Run pip install protobuf==3.20.0
 Run pip install "fastapi[all]"
 copy postprocessing app/
