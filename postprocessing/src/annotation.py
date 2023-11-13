@@ -309,7 +309,7 @@ class AnnotateImage:
         label_row = math.ceil(len(list(set(detcetd_class_ids)))/label_per_row)
         label_width = 60#int(frame.shape[0]/label_per_row)
         img_label = np.zeros([frame.shape[0],150 ,3],dtype=np.uint8)
-        img_label.fill(100)
+        img_label.fill(255)
         i = 0
         j = 0
         xgap = 5
