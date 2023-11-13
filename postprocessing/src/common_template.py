@@ -11,7 +11,7 @@ class Template(Model, DetectionProcess, Computation):
     """
     Template for Detection
     """
-    def __init__(self, image, image_name, camera_id, image_time, steps, frame):
+    def __init__(self, image, split_image, image_name, camera_id, image_time, steps, frame):
         """
         Args:
             image (str): base64 strin
@@ -29,6 +29,7 @@ class Template(Model, DetectionProcess, Computation):
         self.image_time = image_time
         self.steps = steps
         self.frame = frame
+        self.split_image=split_image
 
         self.detected_class = []
         self.expected_class = []

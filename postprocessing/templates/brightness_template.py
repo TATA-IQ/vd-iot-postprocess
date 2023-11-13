@@ -9,7 +9,7 @@ import numpy as np
 
 
 class BrightnessTemplate(Template, PostProcessing,IncidentExtract, Caching):
-    def __init__(self, image, image_name, camera_id, image_time, steps, frame, incidents, usecase_id, rcon=None):
+    def __init__(self, image,split_image, image_name, camera_id, image_time, steps, frame, incidents, usecase_id, rcon=None):
         """
         Brightness Template Initilization
         Args:
@@ -33,7 +33,7 @@ class BrightnessTemplate(Template, PostProcessing,IncidentExtract, Caching):
         self.incidents = incidents
         self.rcon = rcon
         self.usecase_id = usecase_id
-        Template.__init__(self, image, image_name, camera_id, image_time, steps, frame)
+        Template.__init__(self, image,split_image, image_name, camera_id, image_time, steps, frame)
         if self.rcon is not None:
             print("=======cahching initialization=====")
             Caching.__init__(self, self.rcon)

@@ -12,6 +12,7 @@ class ANPRTemplate(Template, Caching, IncidentExtract, PostProcessing, NumberPla
     def __init__(
         self,
         image,
+        split_image,
         image_name,
         camera_id,
         image_time,
@@ -51,7 +52,7 @@ class ANPRTemplate(Template, Caching, IncidentExtract, PostProcessing, NumberPla
         self.camera_id=camera_id
         self.mask = mask
         self.image_back = image_back
-        Template.__init__(self, image, image_name, camera_id, image_time, steps, frame)
+        Template.__init__(self, image,split_image, image_name, camera_id, image_time, steps, frame)
         if self.rcon is not None:
             print("=======cahching initialization=====")
             Caching.__init__(self, self.rcon)

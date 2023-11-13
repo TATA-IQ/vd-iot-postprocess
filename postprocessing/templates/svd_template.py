@@ -16,7 +16,7 @@ from PIL import ImageColor
 
 class SVDTemplate(Template, Caching, IncidentExtract):
     def __init__(
-        self, image, image_name, camera_id, image_time, steps, frame, incidents, usecase_id, boundary_config ,tracker=None, rcon=None
+        self, image, split_image,image_name, camera_id, image_time, steps, frame, incidents, usecase_id, boundary_config ,tracker=None, rcon=None
     ):
         """
         SVD Template Initilization
@@ -61,7 +61,7 @@ class SVDTemplate(Template, Caching, IncidentExtract):
         self.y_l2=int((self.y_l2/image_height)*fr_h)
         print("=======y1 after change=====",self.y_l1)
         print("=======y2 after change=====",self.y_l2)
-        Template.__init__(self, image, image_name, camera_id, image_time, steps, frame)
+        Template.__init__(self, image, split_image,image_name, camera_id, image_time, steps, frame)
         if self.rcon is not None:
             print("=======cahching initialization=====")
             Caching.__init__(self, self.rcon)

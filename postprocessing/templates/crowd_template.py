@@ -10,6 +10,7 @@ class CrowdTemplate(Template, PostProcessing, IncidentExtract, Caching):
     def __init__(
         self,
         image,
+        split_image,
         image_name,
         camera_id,
         image_time,
@@ -48,7 +49,7 @@ class CrowdTemplate(Template, PostProcessing, IncidentExtract, Caching):
         self.mask = mask
         self.image_back = image_back
         self.rcon = rcon
-        Template.__init__(self, image, image_name, camera_id, image_time, steps, frame)
+        Template.__init__(self, image, split_image, image_name, camera_id, image_time, steps, frame)
         if self.rcon is not None:
             print("=======cahching initialization=====")
             Caching.__init__(self, self.rcon)

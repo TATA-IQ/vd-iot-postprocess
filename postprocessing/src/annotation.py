@@ -7,7 +7,7 @@ import cv2
 import numpy as np
 from PIL import ImageColor
 import copy
-
+import math
 class AnnotateImage:
     def __init__(self, expected_class, detected_class, frame, misc_data=None):
         """
@@ -22,6 +22,7 @@ class AnnotateImage:
         self.detected_class = detected_class
         self.frame = frame
         self.misc_data = misc_data
+        
 
     def create_legend(self):
         '''
@@ -32,124 +33,368 @@ class AnnotateImage:
         h, w, c = self.frame.shape
         legend = np.full(shape=(h, int(0.2 * w), c), fill_value=255, dtype=self.frame.dtype)
         return legend
-
-    def external_legend(self, frame,expected_classes,detected_class):
-        '''
-        Mark external legend on image
-        Args:
-            frame (np.array):  numpy array
-        returns:
-            frame (np.array):  numpy array
-        '''
+    def bottom_legend(self,frame,expected_classes, detected_class):
         h, w, c = frame.shape
-        FONT_SCALE = 0.5
-        legend = self.create_legend()
-        frame = cv2.hconcat([frame, legend])
-        totaldetected_class = len(detected_class)
-        pixeldiff_h, pixeldiff_w, pixeldiff_c = frame.shape
-        start_pixel_h = 30
+        label_height=30
+        box_width=20
+        box_height=20
+        label_per_row=4
+        label_height=30
         class_ids = [i["class_id"] for i in expected_classes]
-        # start_pixel_w=pixeldiff_w-int(0.2*w)+10
-        track_name_list = []
-        np_list = []
-        present_class_id = []
-        present_class_name = []
+        detcetd_class_ids=[ i["class_id"] for i in detected_class]
+
+        label_row = math.ceil(len(list(set(detcetd_class_ids)))/label_per_row)
+        label_width = int(frame.shape[1]/label_per_row)
+        img_label = np.zeros([label_row*label_height, frame.shape[1],3],dtype=np.uint8)
+        img_label.fill(255)
+        i = 0
+        j = 0
+        xgap = 5
+        ygap = 5
+        unique_class=list(set([i["class_name"] for i in detected_class]))
+        unique_class_id=list(set([i["class_id"] for i in detected_class]))
+        for cls,idx in zip(unique_class,unique_class_id):
+            expected_class = expected_classes[class_ids.index(int(idx))]
+            xo,  yo = i*label_width, j*label_height
+            bound_color=ImageColor.getcolor(expected_class["bound_color"],"RGB")[::-1]
+            text_color=ImageColor.getcolor(expected_class["text_color"],"RGB")[::-1]
+            bound_thickness=expected_class["bound_thickness"]
+            text_thickness=expected_class["text_thickness"]
+            img_label = cv2.rectangle(img_label, (int(xo+xgap), int(yo+ygap)), (int(xo+xgap+box_width), int(yo+ygap+box_height)), bound_color, bound_thickness)
+            img_label = cv2.putText(img_label, expected_class["class_name"], (int(xo+box_width+2*xgap), int(yo+ygap+box_height)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, text_color,text_thickness)
+            i+=1
+            if(i>=label_per_row):
+                i=0
+                j+=1
         for det in detected_class:
-            # print("===annot detect===")
-            try:
-                class_id = det["class_id"]
-            except:
-                return frame
-            # print(self.expected_class)
-            # print(class_ids)
-            # print(class_id)
-            # print("======")
-            # print(class_ids.index(int(class_id)))
-            # print("+++++")
+            class_id=det["class_id"]
             expected_class = expected_classes[class_ids.index(int(class_id))]
-            # print("===got exected class====")
-            # frame=cv2.putText(frame,det["class_name"],org=(start_pixel_w,start_pixel_h),
-            # fontFace = cv2.FONT_HERSHEY_SIMPLEX, fontScale=0.5,color=ImageColor.getcolor(expected_class["text_color"], "RGB"),
-            # thickness=3)
-            # cv2.imwrite("font.jpg",frame)
-            width = int(det["xmax"]) - int(det["xmin"])
-            height = int(det["ymax"]) - int(det["ymin"])
-            # frame=cv2.circle(frame,( start_pixel_w+70, start_pixel_h-3),5, ImageColor.getcolor(expected_class["bound_color"], "RGB")[::-1], cv2.FILLED)
-            frame = cv2.rectangle(
-                frame,
-                (det["xmin"], det["ymin"]),
-                (det["xmax"], det["ymax"]),
-                color=ImageColor.getcolor(expected_class["bound_color"], "RGB")[::-1],
-                thickness=expected_class["bound_thickness"],
-            )
-            if det["class_name"] in det and type(det[det["class_name"]])== type('abc'):
-                cv2.rectangle(
+            bound_color=ImageColor.getcolor(expected_class["bound_color"],"RGB")[::-1]
+            text_color=ImageColor.getcolor(expected_class["text_color"],"RGB")[::-1]
+            bound_thickness=expected_class["bound_thickness"]
+            text_thickness=expected_class["text_thickness"]
+            xmin,ymin,xmax,ymax=det["xmin"],det["ymin"],det["xmax"],det["ymax"]
+            class_id=det["class_id"]
+            
+            cv2.rectangle(frame,(xmin, ymin),(xmax,ymax),bound_color,bound_thickness)
+            cv2.rectangle(
                     frame,
                     (det["xmin"], det["ymin"]),
                     (det["xmin"] + (det["xmax"] - det["xmin"]), det["ymin"] - 30),
-                    color=ImageColor.getcolor(expected_class["bound_color"], "RGB")[::-1],
-                    thickness=1,
+                    bound_color,
+                    -1
                 )
+            if det["class_name"] in det and type(det[det["class_name"]])== type('abc'):
+               
                 cv2.putText(
                     frame,
                     str(det[det["class_name"]]),
                     (int(det["xmin"]), int(det["ymin"])),
                     cv2.FONT_HERSHEY_SIMPLEX,
                      0.5,
-                    (0, 0, 0),
-                    thickness=expected_class["text_thickness"]
+                    text_color,
+                    thickness=text_thickness
                 )
             if "speed" in det:
-                cv2.rectangle(
-                    frame,
-                    (det["xmin"], det["ymin"]),
-                    (det["xmin"] + (det["xmax"] - det["xmin"]), det["ymin"] - 30),
-                    color=ImageColor.getcolor(expected_class["bound_color"], "RGB")[::-1],
-                    thickness=-1,
-                )
                 cv2.putText(
                     frame,
                     str(det["speed"])+" kmph",
                     (int(det["xmax"])-30, int(det["ymin"])),
                     cv2.FONT_HERSHEY_SIMPLEX,
                      0.5,
-                    (0, 0, 0),
-                    thickness=expected_class["text_thickness"]
+                    text_color,
+                    thickness=text_thickness
                 )
 
-            present_class_id.append(class_id)
-            present_class_name.append(det["class_name"])
-        present_class_id = list(set(present_class_id))
-        present_class_name = list(set(present_class_name))
-        # print("=====external annotation======")
-        for clas, idcls in zip(present_class_name, present_class_id):
-            # print("======annot=====",idcls,clas)
-            expected_class = self.expected_class[class_ids.index(int(idcls))]
-            # print("======annot2=====",w,h)
-            # print(frame.shape)
-            start_pixel_w = int(w + 0.01 * w)
-            start_pixel_h = start_pixel_h + 10
-            # print(start_pixel_h,start_pixel_w)
-            frame = cv2.circle(
-                frame,
-                (start_pixel_w, start_pixel_h),
-                5,
-                ImageColor.getcolor(expected_class["bound_color"], "RGB")[::-1],
-                cv2.FILLED,
-            )
-            frame = cv2.putText(
-                frame,
-                clas,
-                org=(start_pixel_w + 10, start_pixel_h),
-                fontFace=cv2.FONT_HERSHEY_SIMPLEX,
-                fontScale=0.5,
-                color=(0,0,0),
-                thickness=2,
-            )
-            # print("======annot3=====")
-            start_pixel_h = start_pixel_h + 40
-        return frame
 
+
+            
+        image_final = cv2.vconcat([frame, img_label])
+
+        return image_final
+
+
+
+    def top_legend(self,frame,expected_classes, detected_class):
+        h, w, c = frame.shape
+        label_height=30
+        box_width=20
+        box_height=20
+        label_per_row=4
+        label_height=30
+        class_ids = [i["class_id"] for i in expected_classes]
+        detcetd_class_ids=[ i["class_id"] for i in detected_class]
+
+        label_row = math.ceil(len(list(set(detcetd_class_ids)))/label_per_row)
+        label_width = int(frame.shape[1]/label_per_row)
+        img_label = np.zeros([label_row*label_height, frame.shape[1],3],dtype=np.uint8)
+        img_label.fill(255)
+        i = 0
+        j = 0
+        xgap = 5
+        ygap = 5
+        unique_class=list(set([i["class_name"] for i in detected_class]))
+        unique_class_id=list(set([i["class_id"] for i in detected_class]))
+        for cls,idx in zip(unique_class,unique_class_id):
+            expected_class = expected_classes[class_ids.index(int(idx))]
+            xo,  yo = i*label_width, j*label_height
+            bound_color=ImageColor.getcolor(expected_class["bound_color"],"RGB")[::-1]
+            text_color=ImageColor.getcolor(expected_class["text_color"],"RGB")[::-1]
+            bound_thickness=expected_class["bound_thickness"]
+            text_thickness=expected_class["text_thickness"]
+            img_label = cv2.rectangle(img_label, (int(xo+xgap), int(yo+ygap)), (int(xo+xgap+box_width), int(yo+ygap+box_height)), bound_color, bound_thickness)
+            img_label = cv2.putText(img_label, expected_class["class_name"], (int(xo+box_width+2*xgap), int(yo+ygap+box_height)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, text_color,text_thickness)
+            i+=1
+            if(i>=label_per_row):
+                i=0
+                j+=1
+        for det in detected_class:
+            class_id=det["class_id"]
+            expected_class = expected_classes[class_ids.index(int(class_id))]
+            bound_color=ImageColor.getcolor(expected_class["bound_color"],"RGB")[::-1]
+            text_color=ImageColor.getcolor(expected_class["text_color"],"RGB")[::-1]
+            bound_thickness=expected_class["bound_thickness"]
+            text_thickness=expected_class["text_thickness"]
+            xmin,ymin,xmax,ymax=det["xmin"],det["ymin"],det["xmax"],det["ymax"]
+            class_id=det["class_id"]
+            
+            cv2.rectangle(frame,(xmin, ymin),(xmax,ymax),bound_color,bound_thickness)
+            cv2.rectangle(
+                    frame,
+                    (det["xmin"], det["ymin"]),
+                    (det["xmin"] + (det["xmax"] - det["xmin"]), det["ymin"] - 30),
+                    bound_color,
+                    -1
+                )
+            if det["class_name"] in det and type(det[det["class_name"]])== type('abc'):
+               
+                cv2.putText(
+                    frame,
+                    str(det[det["class_name"]]),
+                    (int(det["xmin"]), int(det["ymin"])),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                     0.5,
+                    text_color,
+                    thickness=text_thickness
+                )
+            if "speed" in det:
+                cv2.putText(
+                    frame,
+                    str(det["speed"])+" kmph",
+                    (int(det["xmax"])-30, int(det["ymin"])),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                     0.5,
+                    text_color,
+                    thickness=text_thickness
+                )
+
+
+
+            
+        image_final = cv2.vconcat([ img_label, frame])
+
+        return image_final
+
+   
+
+    
+    def left_legend(self,frame,expected_classes, detected_class):
+        h, w, c = frame.shape
+        label_height=30
+        box_width=10
+        box_height=10
+        label_per_row=1
+        label_height=30
+        class_ids = [i["class_id"] for i in expected_classes]
+        detcetd_class_ids=[ i["class_id"] for i in detected_class]
+
+        label_row = math.ceil(len(list(set(detcetd_class_ids)))/label_per_row)
+        label_width = 60#int(frame.shape[0]/label_per_row)
+        img_label = np.zeros([frame.shape[0],150 ,3],dtype=np.uint8)
+        img_label.fill(255)
+        i = 0
+        j = 0
+        xgap = 5
+        ygap = 5
+        print("======left legend======")
+        drawn_target=[]
+        unique_class=list(set([i["class_name"] for i in detected_class]))
+        unique_class_id=list(set([i["class_id"] for i in detected_class]))
+        for cls,idx in zip(unique_class,unique_class_id):
+            expected_class = expected_classes[class_ids.index(int(idx))]
+            xo,  yo = i*label_width, j*label_height
+            bound_color=ImageColor.getcolor(expected_class["bound_color"],"RGB")[::-1]
+            text_color=ImageColor.getcolor(expected_class["text_color"],"RGB")[::-1]
+            bound_thickness=expected_class["bound_thickness"]
+            text_thickness=expected_class["text_thickness"]
+            img_label = cv2.rectangle(img_label, (int(xo+xgap), int(yo+ygap)), (int(xo+xgap+box_width), int(yo+ygap+box_height)), bound_color, bound_thickness)
+            img_label = cv2.putText(img_label, expected_class["class_name"], (int(xo+box_width+2*xgap), int(yo+ygap+box_height)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, text_color,text_thickness)
+            i+=1
+            if(i>=label_per_row):
+                i=0
+                j+=1
+
+
+
+        for det in detected_class:
+            print("======det1======")
+            class_id=det["class_id"]
+            expected_class = expected_classes[class_ids.index(int(class_id))]
+           
+            bound_color=ImageColor.getcolor(expected_class["bound_color"],"RGB")[::-1]
+            print("====det3====",bound_color)
+            text_color=ImageColor.getcolor(expected_class["text_color"],"RGB")[::-1]
+            print("====det4====",text_color)
+            bound_thickness=expected_class["bound_thickness"]
+            print("====det5====",bound_thickness)
+            text_thickness=expected_class["text_thickness"]
+            print("====det6====",bound_thickness)
+            print("====det7======")
+            
+            
+            xmin,ymin,xmax,ymax=det["xmin"],det["ymin"],det["xmax"],det["ymax"]
+            class_id=det["class_id"]
+            print("====det8======")
+            
+            cv2.rectangle(frame,(xmin, ymin),(xmax,ymax),bound_color,bound_thickness)
+            cv2.rectangle(
+                    frame,
+                    (det["xmin"], det["ymin"]),
+                    (det["xmin"] + (det["xmax"] - det["xmin"]), det["ymin"] - 30),
+                    bound_color,
+                    -1
+                )
+        
+            if det["class_name"] in det and type(det[det["class_name"]])== type('abc'):
+               
+                cv2.putText(
+                    frame,
+                    str(det[det["class_name"]]),
+                    (int(det["xmin"]), int(det["ymin"])),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                     0.5,
+                    text_color,
+                    thickness=text_thickness
+                )
+            if "speed" in det:
+                cv2.putText(
+                    frame,
+                    str(det["speed"])+" kmph",
+                    (int(det["xmax"])-30, int(det["ymin"])),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                     0.5,
+                    text_color,
+                    thickness=text_thickness
+                )
+
+
+
+            
+        image_final = cv2.hconcat([frame, img_label])
+
+        return image_final
+
+
+
+    def right_legend(self,frame,expected_classes, detected_class):
+        h, w, c = frame.shape
+        label_height=30
+        box_width=10
+        box_height=10
+        label_per_row=1
+        label_height=30
+        class_ids = [i["class_id"] for i in expected_classes]
+        detcetd_class_ids=[ i["class_id"] for i in detected_class]
+
+        label_row = math.ceil(len(list(set(detcetd_class_ids)))/label_per_row)
+        label_width = 60#int(frame.shape[0]/label_per_row)
+        img_label = np.zeros([frame.shape[0],150 ,3],dtype=np.uint8)
+        img_label.fill(100)
+        i = 0
+        j = 0
+        xgap = 5
+        ygap = 5
+        print("======left legend======")
+        drawn_target=[]
+        unique_class=list(set([i["class_name"] for i in detected_class]))
+        unique_class_id=list(set([i["class_id"] for i in detected_class]))
+        for cls,idx in zip(unique_class,unique_class_id):
+            expected_class = expected_classes[class_ids.index(int(idx))]
+            xo,  yo = i*label_width, j*label_height
+            bound_color=ImageColor.getcolor(expected_class["bound_color"],"RGB")[::-1]
+            text_color=ImageColor.getcolor(expected_class["text_color"],"RGB")[::-1]
+            bound_thickness=expected_class["bound_thickness"]
+            text_thickness=expected_class["text_thickness"]
+            img_label = cv2.rectangle(img_label, (int(xo+xgap), int(yo+ygap)), (int(xo+xgap+box_width), int(yo+ygap+box_height)), bound_color, bound_thickness)
+            img_label = cv2.putText(img_label, expected_class["class_name"], (int(xo+box_width+2*xgap), int(yo+ygap+box_height)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, text_color,text_thickness)
+            i+=1
+            if(i>=label_per_row):
+                i=0
+                j+=1
+
+
+
+        for det in detected_class:
+            print("======det1======")
+            class_id=det["class_id"]
+            expected_class = expected_classes[class_ids.index(int(class_id))]
+           
+            bound_color=ImageColor.getcolor(expected_class["bound_color"],"RGB")[::-1]
+            print("====det3====",bound_color)
+            text_color=ImageColor.getcolor(expected_class["text_color"],"RGB")[::-1]
+            print("====det4====",text_color)
+            bound_thickness=expected_class["bound_thickness"]
+            print("====det5====",bound_thickness)
+            text_thickness=expected_class["text_thickness"]
+            print("====det6====",bound_thickness)
+            print("====det7======")
+            
+            
+            xmin,ymin,xmax,ymax=det["xmin"],det["ymin"],det["xmax"],det["ymax"]
+            class_id=det["class_id"]
+            print("====det8======")
+            
+            cv2.rectangle(frame,(xmin, ymin),(xmax,ymax),bound_color,bound_thickness)
+            cv2.rectangle(
+                    frame,
+                    (det["xmin"], det["ymin"]),
+                    (det["xmin"] + (det["xmax"] - det["xmin"]), det["ymin"] - 30),
+                    bound_color,
+                    -1
+                )
+        
+            if det["class_name"] in det and type(det[det["class_name"]])== type('abc'):
+               
+                cv2.putText(
+                    frame,
+                    str(det[det["class_name"]]),
+                    (int(det["xmin"]), int(det["ymin"])),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                     0.5,
+                    text_color,
+                    thickness=text_thickness
+                )
+            if "speed" in det:
+                cv2.putText(
+                    frame,
+                    str(det["speed"])+" kmph",
+                    (int(det["xmax"])-30, int(det["ymin"])),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                     0.5,
+                    text_color,
+                    thickness=text_thickness
+                )
+
+
+
+            
+        image_final = cv2.hconcat([ img_label,frame])
+
+        return image_final
+
+
+
+    
     def internal_legend(self, frame,expected_classes,detected_class):
         '''
         Annotate internally on image
@@ -158,14 +403,11 @@ class AnnotateImage:
         returns:
             frame (np.array):  numpy array
         '''
-        # print("====internal legend=======")
+       
         FONT_SCALE = 0.5
         try:
             # print("====class id====")
             class_ids = [i["class_id"] for i in expected_classes]
-            # ids=[i["id"] for i in self.expected_class ]
-            # print("=======det====")
-            # print(self.detected_class)
             for det in detected_class:
                 # print(det)
                 x1 = det["xmin"]
@@ -173,19 +415,13 @@ class AnnotateImage:
                 x2 = det["xmax"]
                 y2 = det["ymax"]
                 class_name = det["class_name"]
-                # print("=*********")
                 width = int(x2) - int(x1)
                 height = int(y2) - int(y1)
                 class_id = det["class_id"]
-                # print("=======expected====")
                 expected_class = expected_classes[class_id.index(str(class_id))]
 
-                # overlap = output[i]["overlap"]
-                # print("=======annotation====")
-                print("====Image color====")
-                print(class_name, det["id"])
-                print(ImageColor.getcolor(expected_class["bound_color"], "RGB")[::-1])
-
+                
+                
                 frame = cv2.rectangle(
                     frame,
                     (int(x1), int(y1)),
@@ -193,17 +429,15 @@ class AnnotateImage:
                     color=ImageColor.getcolor(expected_class["bound_color"], "RGB")[::-1],
                     thickness=expected_class["text_thickness"],
                 )
-                # cv2.rectangle(image, (int(x1), int(y1)), (int(x1)+(int(x2) - int(x1)), int(y1) - 10), color=color_code[class_name],
-                #             thickness=-1)
-                # print("=====text========")
+                
                 if det["id"] is  None:
                     
                     cv2.rectangle(
                         frame,
                         (int(x1), int(y1)),
                         (int(x1) + (int(x2) - int(x1)), int(y1) - 30),
-                        color=ImageColor.getcolor(expected_class["bound_color"], "RGB")[::-1],
-                        thickness=-1,
+                        ImageColor.getcolor(expected_class["bound_color"], "RGB")[::-1],
+                        -1,
                     )
                     frame = cv2.putText(
                         frame,
@@ -219,8 +453,8 @@ class AnnotateImage:
                         frame,
                         (int(x1), int(y1)),
                         (int(x1) + (int(x2) - int(x1)), int(y1) - 30),
-                        color=ImageColor.getcolor(expected_class["bound_color"], "RGB")[::-1],
-                        thickness=-1,
+                        ImageColor.getcolor(expected_class["bound_color"], "RGB")[::-1],
+                        -1,
                     )
                     frame = cv2.putText(
                         frame,
@@ -232,13 +466,7 @@ class AnnotateImage:
                         thickness=1
                     )
                 if det["class_name"] in det and  type(det[det["class_name"]])== type('abc') and len(det[det["class_name"]]) > 0:
-                    # cv2.rectangle(
-                    #     frame,
-                    #     (det["xmin"], det["ymin"]),
-                    #     (det["xmin"] + (det["xmax"] - det["xmin"]), det["ymin"] - 30),
-                    #     color=ImageColor.getcolor(expected_class["bound_color"], "RGB")[::-1],
-                    #     thickness=-1,
-                    # )
+                    
                     cv2.putText(
                         frame,
                         str(det[det["class_name"]]),
@@ -249,13 +477,7 @@ class AnnotateImage:
                 thickness=2
                     )
                 if "speed" in det:
-                    # cv2.rectangle(
-                    #     frame,
-                    #     (det["xmin"], det["ymin"]),
-                    #     (det["xmin"] + (det["xmax"] - det["xmin"]), det["ymin"] - 30),
-                    #     color=ImageColor.getcolor(expected_class["bound_color"], "RGB")[::-1],
-                    #     thickness=-1,
-                    # )
+                    
                     cv2.putText(
                         frame,
                         str(det["speed"])+" kmph",
@@ -301,7 +523,7 @@ class AnnotateImage:
                 # cv2.imwrite("abc.jpg",frame)
         return frame
 
-    def annotate(self, legend_state=0):
+    def annotate(self, legend_state=0,orientation=1):
         '''
         Annotate externally or internaly on frame
         Args:
@@ -315,14 +537,25 @@ class AnnotateImage:
         expected_classes=copy.deepcopy(self.expected_class)
         detected_class=copy.deepcopy(self.detected_class)
         frame = self.annotate_computation(frame,misc_data)
+        #frame=self.bottom_legend(frame,expected_classes,detected_class)
 
-        # h,w,c=frame.shape
+        h,w,c=frame.shape
         if len(self.detected_class) > 0:
-            # frame=self.external_legend(frame)
+            
             try:
                 if int(legend_state) == 1:
+                    if orientation==2:
                     # print("====exter legend====")
-                    frame = self.external_legend(frame,expected_classes,detected_class)
+                        frame = self.left_legend(frame,expected_classes,detected_class)
+                    elif orientation==1:
+                        frame = self.right_legend(frame,expected_classes,detected_class)
+                    elif orientation==4:
+                        frame = self.bottom_legend(frame,expected_classes,detected_class)
+                    elif orientation==3:
+                        frame = self.top_legend(frame,expected_classes,detected_class)
+
+                    
+                        
                 else:
                     # print("====internal legend====")
                     frame = self.internal_legend(frame,expected_classes,detected_class)

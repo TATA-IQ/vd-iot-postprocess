@@ -12,6 +12,7 @@ class GarbageTemplate(Template, Caching, IncidentExtract, PostProcessing):
     def __init__(
         self,
         image,
+        split_image,
         image_name,
         camera_id,
         image_time,
@@ -50,7 +51,7 @@ class GarbageTemplate(Template, Caching, IncidentExtract, PostProcessing):
         self.rcon = rcon
         self.mask = mask
         self.image_back = image_back
-        Template.__init__(self, image, image_name, camera_id, image_time, steps, frame)
+        Template.__init__(self, image, split_image, image_name, camera_id, image_time, steps, frame)
         if self.rcon is not None:
             print("=======cahching initialization=====")
             Caching.__init__(self, self.rcon)

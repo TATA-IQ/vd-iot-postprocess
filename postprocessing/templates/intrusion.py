@@ -9,6 +9,7 @@ class IntrusionTemplate(Template, Caching, IncidentExtract, PostProcessing):
     def __init__(
         self,
         image,
+        split_image,
         image_name,
         camera_id,
         image_time,
@@ -48,7 +49,7 @@ class IntrusionTemplate(Template, Caching, IncidentExtract, PostProcessing):
         self.rcon = rcon
         self.usecase_id = usecase_id
         self.camea_id = camera_id
-        Template.__init__(self, image, image_name, camera_id, image_time, steps, frame)
+        Template.__init__(self, image, split_image, image_name, camera_id, image_time, steps, frame)
         if self.rcon is not None:
             print("=======cahching initialization=====")
             Caching.__init__(self, self.rcon)
