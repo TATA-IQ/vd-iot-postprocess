@@ -28,7 +28,8 @@ python3 app.py
 
 # Docker 
 1. Contenirization is enabled
-2. change the config.yaml
+2. sudo docker run -d -p 6379:6379 --name myredis  redis
+3. change the config.yaml
 2. Navigate to the Dockerfile level
 2. build the container (sudo docker build -t "postprocess")
 3. Run the container (sudo docker run -p 8007:8007 -t "postprocess")
