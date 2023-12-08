@@ -1,23 +1,5 @@
 ---
-apis:
-  camera_group: "http://172.16.0.204:8051/getCameraGroup"
-  preprocess_config: "http://172.16.0.204:8051/getCameraGroup"
-  schedule_config: "http://172.16.0.204:8051/getCameraConfig"
-  postprocess_config: "http://172.16.0.204:8051/getpostprocess"
-  usecase_urls: "http://172.16.0.204:8051/getusecase"
-  classes: "http://172.16.0.204:8051/getclasses"
-  computation: "http://172.16.0.204:8051/getcomputation"
-  incidents: "http://172.16.0.204:8051/getincidents"
-  boundary_config: "http://172.16.0.204:8051/getboundary"
-  
+consul_url: "http://consul.service.consul:8500/v1/agent/services"
 
-kafka:
-  - 172.16.0.175:9092
-  - 172.16.0.171:9092
-  - 172.16.0.174:9092
-
-tracking_server:
-  host: "localhost"
-  port: "50051"
 
 
