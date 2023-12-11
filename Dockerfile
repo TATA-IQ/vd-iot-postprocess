@@ -1,4 +1,4 @@
-FROM python:3.9.2
+FROM python:3.9.2-slim
 RUN pip install pandas
 RUN pip install kafka-python
 RUN apt-get update
@@ -25,7 +25,13 @@ Run pip install shared-memory-dict==0.7.2
 Run pip install paramiko
 Run pip install grpcio-tools
 Run pip install protobuf==3.20.0
+RUN apt-get install 
 Run pip install "fastapi[all]"
+RUN pip install consul
+# RUN systemctl stop systemd-resolve
+# RUN systemctl disable systemd-resolve
+#RUN apt install dnsmasq
+#RUN echo "address=/service.consul/172.16.0.178" | tee "/etc/dnsmasq.conf"
 copy postprocessing app/
 workdir /app
 CMD chmod +x run.sh
