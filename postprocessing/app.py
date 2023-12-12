@@ -34,68 +34,106 @@ queue_image = manager.Queue()
 def register_service(consul_conf,port):
     name=socket.gethostname()
     local_ip=socket.gethostbyname(socket.gethostname())
-    consul_client = consul.Consul(host=consul_conf["host"],port=consul_conf["port"])
+    consul_client = consul.Consul(host=consul_conf["host"],port=int(consul_conf["port"]))
     consul_client.agent.service.register(
-    "postprocess",service_id=name,
-    port=port,
+    "postprocess",service_id=name+"-postrocess-"+consul_conf["env"],
+    port=int(port),
     address=local_ip,
-    tags=["python","postprocess","postprocess"]
-    )
+    tags=["python","postprocess",consul_conf["env"]]
+)
 
+def get_service_address(consul_client,service_name,env):
+    while True:
+        
+        try:
+            services=consul_client.catalog.service(service_name)[1]
+            print(services)
+            for i in services:
+                if env == i["ServiceID"].split("-")[-1]:
+                    return i
+        except:
+            time.sleep(10)
+            continue
+def get_confdata(consul_conf):
+    consul_client = consul.Consul(host=consul_conf["host"],port=consul_conf["port"])
+    pipelineconf=get_service_address(consul_client,"pipelineconfig",consul_conf["env"])
 
-
-def get_confdata(conf):
-    res=requests.get(conf[0]["consul_url"])
-    data=res.json()
-    dbconf =None
     
-    postprocessconf=None
-    env=None
-    consulconf=None
-    if "pipelineconfig" in data:
-        port=data["pipelineconfig"]["Port"]
-        while True:
-            endpoints=requests.get("http://pipelineconfig.service.consul:"+str(port)+"/").json()
-            #print(endpoints)
-            if "modelvalidation" in endpoints["endpoint"]:
-                try:
-                    postprocessconf=requests.get("http://pipelineconfig.service.consul:"+str(port)+"/"+endpoints["endpoint"]["postprocess"]).json()
-                except Exception as ex:
-                    print(ex)
-                    time.sleep(5)
-                    continue
-            if "dbapi" in endpoints["endpoint"] and "dbapi" in data:
-                try:
-                    dbconf=requests.get("http://pipelineconfig.service.consul:"+str(port)+"/"+endpoints["endpoint"]["dbapi"]).json()
-                except Exception as ex:
-                    print(ex)
-                    time.sleep(5)
-                    continue
-            print(dbconf)
-            print(postprocessconf)
-            if "kafka" in endpoints["endpoint"]:
-                try:
-                    kafkaconf=requests.get("http://pipelineconfig.service.consul:"+str(port)+"/"+endpoints["endpoint"]["kafka"]).json()
-                except Exception as ex:
-                    print(ex)
-                    time.sleep(5)
-                    continue
-            if "consul" in endpoints["endpoint"]:
-                try:
-                    consulconf=requests.get("http://pipelineconfig.service.consul:"+str(port)+"/"+endpoints["endpoint"]["consul"]).json()
-                except Exception as ex:
-                    print(ex)
-                    time.sleep(5)
-                    continue
-            print(dbconf)
-            print(postprocessconf)
-            if dbconf is not None and postprocessconf is not None and kafkaconf is not None:
-                break
-    print("******")
-    print(dbconf)
-    return  dbconf,postprocessconf,kafkaconf,consulconf
+    
+    env=consul_conf["env"]
+    
+    endpoint_addr="http://"+pipelineconf["ServiceAddress"]+":"+str(pipelineconf["ServicePort"])
+    print("endpoint addr====",endpoint_addr)
+    while True:
+        
+        try:
+            res=requests.get(endpoint_addr+"/")
+            endpoints=res.json()
+            print("===got endpoints===",endpoints)
+            break
+        except Exception as ex:
+            print("endpoint exception==>",ex)
+            time.sleep(10)
+            continue
+    
+    while True:
+        try:
+            res=requests.get(endpoint_addr+endpoints["endpoint"]["postprocess"])
+            postprocessconf=res.json()
+            print("postprocessconf===>",postprocessconf)
+            break
+            
+
+        except Exception as ex:
+            print("postprocessconf exception==>",ex)
+            time.sleep(10)
+            continue
+    while True:
+        try:
+            res=requests.get(endpoint_addr+endpoints["endpoint"]["kafka"])
+            kafkaconf=res.json()
+            print("kafkaconf===>",kafkaconf)
+            break
+            
+
+        except Exception as ex:
+            print("kafkaconf exception==>",ex)
+            time.sleep(10)
+            continue
+    print("=======searching for dbapi====")
+    while True:
+        try:
+            print("=====consul search====")
+            dbconf=get_service_address(consul_client,"dbapi",consul_conf["env"])
+            print("****",dbconf)
+            dbhost=dbconf["ServiceAddress"]
+            dbport=dbconf["ServicePort"]
+            res=requests.get(endpoint_addr+endpoints["endpoint"]["dbapi"])
+            dbres=res.json()
+            print("===got db conf===")
+            print(dbres)
+            break
+        except Exception as ex:
+            print("db discovery exception===",ex)
+            time.sleep(10)
+            continue
+    for i in dbres["apis"]:
+        print("====>",i)
+        dbres["apis"][i]="http://"+dbhost+":"+str(dbport)+dbres["apis"][i]
+
+    
+    print("======dbres======")
+    print(dbres)
+    print(postprocessconf)
+    print(kafkaconf)
+    return  dbres,postprocessconf,kafkaconf
+
+
+
+
 conf = Config.yamlconfig("config/config.yaml")
-_,postprocessconf,_,_=get_confdata(conf)
+_,postprocessconf,kafkaconf=get_confdata(conf[0]["consul"])
+register_service(conf[0]["consul"],postprocessconf["port"])
 redis_server=postprocessconf["redis"]
 pool = redis.ConnectionPool(host=redis_server["host"], port=redis_server["port"], db=0)
 r_con = redis.Redis(connection_pool=pool)
@@ -188,8 +226,8 @@ if __name__ == "__main__":
     print("=====inside main************")
     logg = create_rotating_log("logs/logs.log")
     conf = Config.yamlconfig("config/config.yaml")
-    dbconf,postprocessconf,kafkaconf,consulconf=get_confdata(conf)
-    register_service(consulconf,postprocessconf["port"])
+    dbconf,postprocessconf,kafkaconf=get_confdata(conf[0]["consul"])
+    register_service(conf[0]["consul"],postprocessconf["port"])
     kafkahost = kafkaconf["kafka"]
     tracking_server=postprocessconf["tracking_server"]
     redis_server=postprocessconf["redis"]

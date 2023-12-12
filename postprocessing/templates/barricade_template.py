@@ -1,5 +1,5 @@
 """
-Garbage Template
+Barricade Template
 """
 from src.cache import Caching
 from src.common_template import Template
@@ -8,7 +8,7 @@ from src.incidents import IncidentExtract
 from src.postprocessing_template import PostProcessing
 
 
-class GarbageTemplate(Template, Caching, IncidentExtract, PostProcessing):
+class BarricadeTemplate(Template, Caching, IncidentExtract, PostProcessing):
     def __init__(
         self,
         image,
@@ -26,7 +26,7 @@ class GarbageTemplate(Template, Caching, IncidentExtract, PostProcessing):
         image_back=None,
     ):
         """
-        Garbage Template Initilization
+        Barricade Template Initilization
         Args:
             image (str): image in string
             image_name (str): name of image
@@ -42,7 +42,7 @@ class GarbageTemplate(Template, Caching, IncidentExtract, PostProcessing):
             image_back (np.array): mask image2
 
         """
-        print("====Initializing crowd=====")
+        print("====Initializing Barricade=====")
         self.frame = image
         self.allsteps = steps
         self.incidents = incidents
@@ -56,10 +56,10 @@ class GarbageTemplate(Template, Caching, IncidentExtract, PostProcessing):
             print("=======cahching initialization=====")
             Caching.__init__(self, self.rcon)
             print("====Caching INitilaize done")
-            data = self.getbykey("garbage", self.camera_id, self.usecase_id)
+            data = self.getbykey("barricade", self.camera_id, self.usecase_id)
             if data is None:
                 self.initialize_cache()
-                incident_cache= self.getbykey("incident_garbage", self.camera_id, self.usecase_id)
+                incident_cache= self.getbykey("incident_barricade", self.camera_id, self.usecase_id)
                 if incident_cache is None:
                     self.initialize_incident_cache()
 
@@ -70,7 +70,7 @@ class GarbageTemplate(Template, Caching, IncidentExtract, PostProcessing):
         cachedict = {}
         cachedict["detections"] = []
 
-        self.setbykey("garbage", self.camera_id, self.usecase_id, cachedict)
+        self.setbykey("barricade", self.camera_id, self.usecase_id, cachedict)
 
     def set_cache(self, currentdata, cachedict):
         '''
@@ -93,7 +93,7 @@ class GarbageTemplate(Template, Caching, IncidentExtract, PostProcessing):
             cachedict = {}
             cachedict["detections"] = []
             cachedict["detections"].insert(0, currentdata)
-        self.setbykey("garbage", self.camera_id, self.usecase_id, cachedict)
+        self.setbykey("barricade", self.camera_id, self.usecase_id, cachedict)
     def initialize_incident_cache(self):
         """
         cache initialization incident
@@ -101,7 +101,7 @@ class GarbageTemplate(Template, Caching, IncidentExtract, PostProcessing):
         cachedict = {}
 
         cachedict["incidents"] = []
-        self.setbykey("incident_garbage", self.camera_id, self.usecase_id, cachedict)
+        self.setbykey("incident_barricade", self.camera_id, self.usecase_id, cachedict)
         print("======cache initialized====")
 
     def set_cache_incident(self,  cachedict,currentdata):
@@ -133,7 +133,7 @@ class GarbageTemplate(Template, Caching, IncidentExtract, PostProcessing):
             cachedict["incidents"].insert(0, currentdata)
         # print("***********")
         # print(cachedict)
-        self.setbykey("incident_garbage", self.camera_id, self.usecase_id, cachedict)
+        self.setbykey("incident_barricade", self.camera_id, self.usecase_id, cachedict)
 
 
 
@@ -183,7 +183,7 @@ class GarbageTemplate(Template, Caching, IncidentExtract, PostProcessing):
 
     def process_data(self,logger):
         '''
-        Process Garbage Template
+        Process Barricade Template
         Args:
             logger (object): Logger object
         returns:
@@ -200,7 +200,7 @@ class GarbageTemplate(Template, Caching, IncidentExtract, PostProcessing):
         filtered_res_dict["prediction_class"] = []
         all_detections={}
         all_detections["prediction_class"]=[]
-        print("=======caleed Garbage detection=====")
+        print("=======caleed Barricade detection=====")
         # self.detection_init(self.detected_class,self.expected_class,self.image_time)
         all_detections, masked_image = self.process_steps()
         print("**********filtered dic******")
@@ -208,7 +208,7 @@ class GarbageTemplate(Template, Caching, IncidentExtract, PostProcessing):
 
         print("====Process called=======")
         print(filtered_res_dict)
-        cachedict = self.getbykey("garbage", self.camera_id, self.usecase_id)
+        cachedict = self.getbykey("barricade", self.camera_id, self.usecase_id)
         print("=====cachedict====")
         print(cachedict)
         print("*******fil2*********")
@@ -236,7 +236,7 @@ class GarbageTemplate(Template, Caching, IncidentExtract, PostProcessing):
         print(filtered_res_dict)
         if len(incident_dict)>0:
             print("====len of incident before filter====",len(incident_dict))
-            cachedict_incident=self.getbykey("incident_garbage", self.camera_id, self.usecase_id)
+            cachedict_incident=self.getbykey("incident_barricade", self.camera_id, self.usecase_id)
             incident_dict,current_incidents=self.filter_base_incidents(cachedict_incident,incident_dict)
             
             self.set_cache_incident(cachedict_incident,current_incidents)

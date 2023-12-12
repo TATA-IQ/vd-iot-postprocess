@@ -26,7 +26,8 @@ from templates.intrusion import IntrusionTemplate
 from templates.ppe_template import PPETemplate
 from templates.svd_template import SVDTemplate
 from templates.vehicle import VehicleTemplate
-
+from templates.barricade_template import BarricadeTemplate
+from templates.persononphone_template import PersononPhoneTemplate
 lock=threading.Lock()
 
 class PostProcessingApp:
@@ -664,6 +665,122 @@ class PostProcessingApp:
         del image_time, metadata,legend, topic_name, mask, image_back
         lock.release()
 
+    def persononphone_detect(self,image_width, image_height, usecase_template_id, metadata,camera_id,usecase_id,image_name,incidents,steps,legend, orientation,topic_name,frame,image,image_time,producer,split_image,boundary_config,model_meta,computation_meta):
+        global lock
+        lock.acquire()
+        mask=None
+        image_back=None
+        misc_data=None
+        # metadata=copy.deepcopy(self.metadata)
+        # camera_id=copy.deepcopy(self.camera_id)
+        # usecase_id=copy.deepcopy(self.usecase_id)
+        
+        # try:
+            #metadata=copy.deepcopy(self.metadata)
+        self.logger.info(f"Person on phone Detection starts for {camera_id} and usecase id {usecase_id}")
+        print(f"Person on phone  Detection starts for {camera_id} and usecase id {usecase_id}")
+        try:
+            if boundary_config is not None:
+                mask = Masking(
+                    copy.deepcopy(frame),
+                    
+                    usecase_id,
+                    camera_id,
+                    usecase_template_id,
+                    self.rcon,
+                )
+                print("=====processing mask=====")
+                image_back, mask = mask.process_mask(boundary_config)
+            tracker = TemplateTracking(usecase_id, camera_id, self.grpcclient)
+            garb = PersononPhoneTemplate(
+                image,
+                split_image,
+                image_name,
+                camera_id,
+                image_time,
+                steps,
+                frame,
+                incidents,
+                usecase_id,
+                tracker=tracker,
+                rcon=self.rcon,
+                mask=mask,
+                image_back=image_back
+            )
+            # cv2.imwrite("post_image/before_det/"+image_name,frame)
+            detection_output, incident_out, expected_class, masked_image = garb.process_data(self.logger)
+            # cv2.imwrite("post_image/after_det/"+image_name,frame)
+            self.prepare_send(image_width, image_height,producer,camera_id,usecase_id,image_time,topic_name,legend,orientation,metadata,image_name,frame,expected_class, detection_output, incident_out, masked_image, misc_data)
+            
+            self.logger.info(f"Person on phone  Detection ends for {camera_id} and usecase id {usecase_id}")
+            print(f"Person on phone  Detection ends for {camera_id} and usecase id {usecase_id}")
+            # del image_name, frame, image, camera_id, usecase_id, incidents,steps
+            # del image_time, metadata,legend, image_time, topic_name
+        except Exception as ex:
+                self.logger.error(f"Person on phone  Exception ends for {camera_id} and usecase id {usecase_id}, for exception {ex}")
+                print(f"Person on phone  Exception ends for {camera_id} and usecase id {usecase_id}, for exception {ex}")
+        del image_name, frame, image, camera_id, usecase_id, incidents,steps
+        del image_time, metadata,legend, topic_name, mask, image_back
+        lock.release()
+    def barricade_detect(self,image_width, image_height, usecase_template_id, metadata,camera_id,usecase_id,image_name,incidents,steps,legend, orientation,topic_name,frame,image,image_time,producer,split_image,boundary_config,model_meta,computation_meta):
+        global lock
+        lock.acquire()
+        mask=None
+        image_back=None
+        misc_data=None
+        # metadata=copy.deepcopy(self.metadata)
+        # camera_id=copy.deepcopy(self.camera_id)
+        # usecase_id=copy.deepcopy(self.usecase_id)
+        
+        # try:
+            #metadata=copy.deepcopy(self.metadata)
+        self.logger.info(f"Barricade Detection starts for {camera_id} and usecase id {usecase_id}")
+        print(f"Barricade Detection starts for {camera_id} and usecase id {usecase_id}")
+        try:
+            if boundary_config is not None:
+                mask = Masking(
+                    copy.deepcopy(frame),
+                    
+                    usecase_id,
+                    camera_id,
+                    usecase_template_id,
+                    self.rcon,
+                )
+                print("=====processing mask=====")
+                image_back, mask = mask.process_mask(boundary_config)
+            tracker = TemplateTracking(usecase_id, camera_id, self.grpcclient)
+            garb = BarricadeTemplate(
+                image,
+                split_image,
+                image_name,
+                camera_id,
+                image_time,
+                steps,
+                frame,
+                incidents,
+                usecase_id,
+                tracker=tracker,
+                rcon=self.rcon,
+                mask=mask,
+                image_back=image_back
+            )
+            # cv2.imwrite("post_image/before_det/"+image_name,frame)
+            detection_output, incident_out, expected_class, masked_image = garb.process_data(self.logger)
+            # cv2.imwrite("post_image/after_det/"+image_name,frame)
+            self.prepare_send(image_width, image_height,producer,camera_id,usecase_id,image_time,topic_name,legend,orientation,metadata,image_name,frame,expected_class, detection_output, incident_out, masked_image, misc_data)
+            
+            self.logger.info(f"Barricade Detection ends for {camera_id} and usecase id {usecase_id}")
+            print(f"Barricade Detection ends for {camera_id} and usecase id {usecase_id}")
+            # del image_name, frame, image, camera_id, usecase_id, incidents,steps
+            # del image_time, metadata,legend, image_time, topic_name
+        except Exception as ex:
+                self.logger.error(f"Barricade Exception ends for {camera_id} and usecase id {usecase_id}, for exception {ex}")
+                print(f"Barricade Exception ends for {camera_id} and usecase id {usecase_id}, for exception {ex}")
+        del image_name, frame, image, camera_id, usecase_id, incidents,steps
+        del image_time, metadata,legend, topic_name, mask, image_back
+        lock.release()
+
+
     def brightness_detect(self,image_width, image_height, usecase_template_id, metadata,camera_id,usecase_id,image_name,incidents,steps,legend,orientation,topic_name,frame,image,image_time,producer,split_image,boundary_config,model_meta,computation_meta):
         global lock
         lock.acquire()
@@ -860,6 +977,11 @@ class PostProcessingApp:
         elif usecase_template_id == 12:
             print("======Template vehicle  Start======")
             self.vehicle_detect(image_width, image_height,usecase_template_id, metadata,camera_id,usecase_id,image_name,incidents,steps,legend,orientation,topic_name,frame,image,image_time,producer,split_image,boundary_config,model_meta,computation_meta)
+        elif usecase_template_id == 14:
+            self.persononphone_detect(image_width, image_height,usecase_template_id, metadata,camera_id,usecase_id,image_name,incidents,steps,legend,orientation,topic_name,frame,image,image_time,producer,split_image,boundary_config,model_meta,computation_meta)
+        elif usecase_template_id == 15:
+            self.barricade_detect(image_width, image_height,usecase_template_id, metadata,camera_id,usecase_id,image_name,incidents,steps,legend,orientation,topic_name,frame,image,image_time,producer,split_image,boundary_config,model_meta,computation_meta)
+
         
 
         # bt=BrightnessTemplate(self.image,self.image_name,self.camera_id,self.image_time,self.steps,self.frame,self.incidents,self.usecase_id,rcon=self.rcon)
