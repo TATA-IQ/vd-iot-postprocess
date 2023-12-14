@@ -21,6 +21,7 @@ from src.main import PostProcessingApp
 from src.parser import Config
 import threading
 import socket
+import time
 os.environ["SHARED_MEMORY_USE_LOCK"] = "1"
 
 
@@ -31,12 +32,28 @@ manager = mp.Manager()
 dicttrack = manager.dict()
 queue_image = manager.Queue()
 
+def get_local_ip():
+        '''
+        Get the ip of server
+        '''
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        try:
+            # doesn't even have to be reachable
+            s.connect(("192.255.255.255", 1))
+            IP = s.getsockname()[0]
+        except:
+            IP = "127.0.0.1"
+        finally:
+            s.close()
+        return IP
+
 def register_service(consul_conf,port):
     name=socket.gethostname()
-    local_ip=socket.gethostbyname(socket.gethostname())
+    # local_ip=socket.gethostbyname(socket.gethostname())
+    local_ip=get_local_ip()
     consul_client = consul.Consul(host=consul_conf["host"],port=int(consul_conf["port"]))
     consul_client.agent.service.register(
-    "postprocess",service_id=name+"-postrocess-"+consul_conf["env"],
+    "postprocess",service_id=name+"-postprocess-"+consul_conf["env"],
     port=int(port),
     address=local_ip,
     tags=["python","postprocess",consul_conf["env"]]
