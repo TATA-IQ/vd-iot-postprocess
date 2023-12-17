@@ -435,6 +435,7 @@ class PostProcessingApp:
         mask=None
         image_back=None
         misc_data=None
+        mask_image=None
         
         # try:
             #metadata=copy.deepcopy(self.metadata)
@@ -455,6 +456,7 @@ class PostProcessingApp:
             print("=====processing mask=====")
             image_back, mask_image = mask.process_mask(boundary_config)
         tracker = TemplateTracking(usecase_id, camera_id, self.grpcclient)
+        
         ddp = DedicatedPathway(
             image,
             split_image,
