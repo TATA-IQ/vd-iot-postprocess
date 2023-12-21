@@ -48,9 +48,10 @@ def get_local_ip():
         return IP
 
 def register_service(consul_conf,port):
+    local_ip=get_local_ip()
     name=socket.gethostname()
     # local_ip=socket.gethostbyname(socket.gethostname())
-    local_ip=get_local_ip()
+    print("====local_ip , name =====",local_ip, name)
     consul_client = consul.Consul(host=consul_conf["host"],port=int(consul_conf["port"]))
     consul_client.agent.service.register(
     "postprocess",service_id=name+"-postprocess-"+consul_conf["env"],
