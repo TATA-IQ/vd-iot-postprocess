@@ -23,6 +23,8 @@ import threading
 import socket
 import time
 os.environ["SHARED_MEMORY_USE_LOCK"] = "1"
+from console_logging.console import Console
+console=Console()
 
 
 app = FastAPI()

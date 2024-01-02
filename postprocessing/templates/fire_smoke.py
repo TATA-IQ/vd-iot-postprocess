@@ -233,7 +233,7 @@ class FireSmoke(Template, Caching, IncidentExtract, PostProcessing):
             
             self.set_cache_incident(cachedict_incident,current_incidents)
             print("====len of incident after filter====",len(incident_dict))
-        if len(filtered_res_dict["prediction_class"]) > 0:
+        if "prediction_class" in filtered_res_dict and len(filtered_res_dict["prediction_class"]) > 0:
             self.set_cache(all_detection, cachedict)
 
         return detection_data, incident_dict, self.expected_class, masked_image

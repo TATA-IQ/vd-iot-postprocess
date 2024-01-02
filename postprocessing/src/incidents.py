@@ -260,8 +260,13 @@ class IncidentExtract:
         return [incidentdict]
 
     def derived_incident(self, idx, step):
+        print("=======Dervied incident====",idx)
+        print(self.incident_class)
+        print(self.incident_values)
         class_name = self.incident_class[idx]
-        icident_value = self.incident_values[idx]
+        print(class_name)
+        # icident_value = self.incident_values[idx]
+        # print(icident_value)
         detected_output = []
         print("====checking derived incidentt====")
 
@@ -311,6 +316,7 @@ class IncidentExtract:
         print(self.derived_steps)
         for idx, inc_id in enumerate(self.incident_type_id):
             if int(inc_id) == 2:
+                
                 for st in self.derived_steps:
                     tempderived_incident, detectin_incidentflag = self.derived_incident(idx, st)
                     print("====incidebts====")

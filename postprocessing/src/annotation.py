@@ -84,7 +84,7 @@ class AnnotateImage:
                     bound_color,
                     -1
                 )
-            if det["class_name"] in det and type(det[det["class_name"]])== type('abc'):
+            if det["class_name"] in det and type(det[det["class_name"]])== type('abc') and len(det[det["class_name"]])>=3 and len(det[det["class_name"]])<=12:
                
                 cv2.putText(
                     frame,
@@ -166,7 +166,7 @@ class AnnotateImage:
                     bound_color,
                     -1
                 )
-            if det["class_name"] in det and type(det[det["class_name"]])== type('abc'):
+            if det["class_name"] in det and type(det[det["class_name"]])== type('abc') and len(det[det["class_name"]])>=3 and len(det[det["class_name"]])<=12:
                
                 cv2.putText(
                     frame,
@@ -265,7 +265,7 @@ class AnnotateImage:
                     -1
                 )
         
-            if det["class_name"] in det and type(det[det["class_name"]])== type('abc'):
+            if det["class_name"] in det and type(det[det["class_name"]])== type('abc') and len(det[det["class_name"]])>=3 and len(det[det["class_name"]])<=12:
                
                 cv2.putText(
                     frame,
@@ -363,7 +363,7 @@ class AnnotateImage:
                     -1
                 )
         
-            if det["class_name"] in det and type(det[det["class_name"]])== type('abc'):
+            if det["class_name"] in det and type(det[det["class_name"]])== type('abc') and len(det[det["class_name"]])>=3 and len(det[det["class_name"]])<=12:
                
                 cv2.putText(
                     frame,
@@ -465,7 +465,7 @@ class AnnotateImage:
                         color=ImageColor.getcolor(expected_class["text_color"], "RGB")[::-1],
                         thickness=1
                     )
-                if det["class_name"] in det and  type(det[det["class_name"]])== type('abc') and len(det[det["class_name"]]) > 0:
+                if det["class_name"] in det and  type(det[det["class_name"]])== type('abc') and len(det[det["class_name"]])>=3 and len(det[det["class_name"]])<=12 > 0:
                     
                     cv2.putText(
                         frame,

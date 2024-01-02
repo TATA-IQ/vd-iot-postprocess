@@ -28,14 +28,16 @@ from templates.svd_template import SVDTemplate
 from templates.vehicle import VehicleTemplate
 from templates.barricade_template import BarricadeTemplate
 from templates.persononphone_template import PersononPhoneTemplate
+from templates.handrail_template import HandrailTemplate
+from console_logging.console import Console
+console=Console()
 lock=threading.Lock()
 
 class PostProcessingApp:
     def __init__(self, rcon,tracking_server, logger):
         # self.verify_cache=VerifyCache(rcon)
         self.rcon = rcon
-        print("=====Tracking server=====")
-        print(tracking_server)
+    
         self.grpcclient = GRPCClient(tracking_server["host"],tracking_server["port"])
         self.logger = logger
 
@@ -440,7 +442,7 @@ class PostProcessingApp:
         # try:
             #metadata=copy.deepcopy(self.metadata)
         self.logger.info(f"Dedicated pathway starts for {camera_id} and usecase id {usecase_id}")
-        print(f"Dedicated pathway starts for {camera_id} and usecase id {usecase_id}")
+        console.info(f"Dedicated pathway starts for {camera_id} and usecase id {usecase_id}")
         
         
         # try:
@@ -453,7 +455,7 @@ class PostProcessingApp:
                 usecase_template_id,
                 self.rcon,
             )
-            print("=====processing mask=====")
+            
             image_back, mask_image = mask.process_mask(boundary_config)
         tracker = TemplateTracking(usecase_id, camera_id, self.grpcclient)
         
@@ -478,7 +480,7 @@ class PostProcessingApp:
         self.prepare_send(image_width, image_height,producer,camera_id,usecase_id,image_time,topic_name,legend,orientation,metadata,image_name,frame,expected_class, detection_output, incident_out, image_back, misc_data)
         
         self.logger.info(f"Dedicated pathway ends for {camera_id} and usecase id {usecase_id}")
-        print(f"Dedicated pathway ends for {camera_id} and usecase id {usecase_id}")
+        console.success(f"Dedicated pathway ends for {camera_id} and usecase id {usecase_id}")
         # del image_name, frame, image, camera_id, usecase_id, incidents,steps
         # del image_time, metadata,legend, image_time, topic_name
         # except Exception as ex:
@@ -487,7 +489,7 @@ class PostProcessingApp:
         del image_name, frame, image, camera_id, usecase_id, incidents,steps
         del image_time, metadata,legend, topic_name, mask, image_back
         lock.release()
-        print("+++++++completed ddp+++++")
+        
     
     def intrusion_detect(self,image_width, image_height, usecase_template_id, metadata,camera_id,usecase_id,image_name,incidents,steps,legend,orientation,topic_name,frame,image,image_time,producer,split_image,boundary_config,model_meta,computation_meta):
         global lock
@@ -504,7 +506,7 @@ class PostProcessingApp:
             #metadata=copy.deepcopy(self.metadata)
         self.logger.info(f"Intrusion starts for {camera_id} and usecase id {usecase_id}")
         
-        print(f"Intrusion starts for {camera_id} and usecase id {usecase_id}")
+        console.info(f"Intrusion starts for {camera_id} and usecase id {usecase_id}")
         try:
             if boundary_config is not None:
                 mask = Masking(
@@ -515,7 +517,7 @@ class PostProcessingApp:
                     usecase_template_id,
                     self.rcon,
                 )
-                print("=====processing mask=====")
+                
                 image_back, mask = mask.process_mask(boundary_config)
             tracker = TemplateTracking(usecase_id, camera_id, self.grpcclient)
             itr = IntrusionTemplate(
@@ -545,6 +547,67 @@ class PostProcessingApp:
         except Exception as ex:
             self.logger.info(f"Intrusion exception for {camera_id} and usecase id {usecase_id}, for exception {ex}")
             print(f"Intrusion exception for {camera_id} and usecase id {usecase_id}, for exception {ex}")
+        del image_name, frame, image, camera_id, usecase_id, incidents,steps
+        del image_time, metadata,legend, topic_name, mask, image_back
+
+        lock.release()
+
+    def handrail_detect(self,image_width, image_height, usecase_template_id, metadata,camera_id,usecase_id,image_name,incidents,steps,legend,orientation,topic_name,frame,image,image_time,producer,split_image,boundary_config,model_meta,computation_meta):
+        global lock
+        
+        lock.acquire()
+        # metadata=copy.deepcopy(self.metadata)
+        # camera_id=copy.deepcopy(self.camera_id)
+        # usecase_id=copy.deepcopy(self.usecase_id)
+        mask=None
+        misc_data=None
+
+        image_back=None
+        
+            #metadata=copy.deepcopy(self.metadata)
+        self.logger.info(f"Handrail starts for {camera_id} and usecase id {usecase_id}")
+        
+        console.info(f"Handrail starts for {camera_id} and usecase id {usecase_id}")
+        try:
+            if boundary_config is not None:
+                mask = Masking(
+                    copy.deepcopy(frame),
+                   
+                    usecase_id,
+                    camera_id,
+                    usecase_template_id,
+                    self.rcon,
+                )
+                
+                image_back, mask = mask.process_mask(boundary_config)
+            tracker = TemplateTracking(usecase_id, camera_id, self.grpcclient)
+            itr = HandrailTemplate(
+                image,
+                split_image,
+                image_name,
+                camera_id,
+                image_time,
+                steps,
+                frame,
+                incidents,
+                usecase_id,
+                tracker=tracker,
+                rcon=self.rcon,
+                mask=mask,
+                image_back=image_back,
+            )
+            # cv2.imwrite("post_image/before_det/"+image_name,frame)
+            detection_output, incident_out, expected_class, masked_image = itr.process_data(self.logger)
+            # cv2.imwrite("post_image/after_det/"+image_name,frame)
+            self.prepare_send(image_width, image_height,producer,camera_id,usecase_id,image_time,topic_name,legend,orientation,metadata,image_name,frame,expected_class, detection_output, incident_out, image_back, misc_data)
+            
+            self.logger.info(f"Handrail ends for {camera_id} and usecase id {usecase_id}")
+            print(f"Handrail ends for {camera_id} and usecase id {usecase_id}")
+            # del image_name, frame, image, camera_id, usecase_id, incidents,steps
+            # del image_time, metadata,legend, image_time, topic_name
+        except Exception as ex:
+            self.logger.info(f"Handrail exception for {camera_id} and usecase id {usecase_id}, for exception {ex}")
+            print(f"Handrail exception for {camera_id} and usecase id {usecase_id}, for exception {ex}")
         del image_name, frame, image, camera_id, usecase_id, incidents,steps
         del image_time, metadata,legend, topic_name, mask, image_back
 
@@ -983,6 +1046,8 @@ class PostProcessingApp:
             self.persononphone_detect(image_width, image_height,usecase_template_id, metadata,camera_id,usecase_id,image_name,incidents,steps,legend,orientation,topic_name,frame,image,image_time,producer,split_image,boundary_config,model_meta,computation_meta)
         elif usecase_template_id == 15:
             self.barricade_detect(image_width, image_height,usecase_template_id, metadata,camera_id,usecase_id,image_name,incidents,steps,legend,orientation,topic_name,frame,image,image_time,producer,split_image,boundary_config,model_meta,computation_meta)
+        elif usecase_template_id == 16:
+            self.handrail_detect(image_width, image_height,usecase_template_id, metadata,camera_id,usecase_id,image_name,incidents,steps,legend,orientation,topic_name,frame,image,image_time,producer,split_image,boundary_config,model_meta,computation_meta)
 
         
 
@@ -1010,10 +1075,10 @@ class PostProcessingApp:
         usecase_template_id = postprocess_config["usecase_template_id"]
 
         print("=========", camera_id, usecase_template_id)
-        #if int(camera_id)==15: #int(usecase_template_id)==11: #and :
+        if int(usecase_template_id)==1: #or int(usecase_template_id)==16 or int(usecase_template_id)==14 or int(usecase_template_id)==1: #and :
             # print("====boundary====")
             # print(boundary_config)
-        self.call_template(image, postprocess_config, topic_name, metadata, boundary_config ,producer)
+            self.call_template(image, postprocess_config, topic_name, metadata, boundary_config ,producer)
         # for steps in list(self.steps.values()):
         #     self.model_meta.append({"model_url":steps["modqel_url"],"model_type":steps["model_type"],"model_framework":steps["model_framework"],"model_id":steps["model_id"]})
         #     #self.process_step_model.append(steps["model_url"],steps["classes"],steps["model_type"],steps["model_framework"])

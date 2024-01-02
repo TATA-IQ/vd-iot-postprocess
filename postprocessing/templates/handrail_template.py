@@ -5,7 +5,7 @@ from src.incidents import IncidentExtract
 from src.postprocessing_template import PostProcessing
 
 
-class DedicatedPathway(Template, Caching, IncidentExtract, PostProcessing):
+class HandrailTemplate(Template, Caching, IncidentExtract, PostProcessing):
     def __init__(
         self,
         image,
@@ -39,7 +39,7 @@ class DedicatedPathway(Template, Caching, IncidentExtract, PostProcessing):
             image_back (np.array): mask image2
 
         """
-        print("====Initializing Pathway=====")
+        print("====Initializing Handrail=====")
         self.frame = frame
         self.allsteps = steps
         self.tracker = tracker
@@ -54,8 +54,8 @@ class DedicatedPathway(Template, Caching, IncidentExtract, PostProcessing):
             print("=======cahching initialization=====")
             Caching.__init__(self, self.rcon)
             print("====Caching INitilaize done")
-            data = self.getbykey("ddp", self.camera_id, self.usecase_id)
-            incident_cache= self.getbykey("incident_pathway", self.camera_id, self.usecase_id)
+            data = self.getbykey("handrail", self.camera_id, self.usecase_id)
+            incident_cache= self.getbykey("incident_handrail", self.camera_id, self.usecase_id)
             if incident_cache is None:
                 self.initialize_incident_cache()
 
@@ -70,7 +70,7 @@ class DedicatedPathway(Template, Caching, IncidentExtract, PostProcessing):
 
         cachedict["detections"] = []
         print("======caching initialization done====")
-        self.setbykey("ddp", self.camera_id, self.usecase_id, cachedict)
+        self.setbykey("handrail", self.camera_id, self.usecase_id, cachedict)
         print("=====cache dict saved to cache")
     def initialize_incident_cache(self):
         """
@@ -79,7 +79,7 @@ class DedicatedPathway(Template, Caching, IncidentExtract, PostProcessing):
         cachedict = {}
 
         cachedict["incidents"] = []
-        self.setbykey("incident_pathway", self.camera_id, self.usecase_id, cachedict)
+        self.setbykey("incident_handrail", self.camera_id, self.usecase_id, cachedict)
         print("======cache initialized====")
 
     def set_cache_incident(self,  cachedict,currentdata):
@@ -109,7 +109,7 @@ class DedicatedPathway(Template, Caching, IncidentExtract, PostProcessing):
             cachedict["incidents"].insert(0, currentdata)
         print("***********")
         print(cachedict)
-        self.setbykey("incident_pathway", self.camera_id, self.usecase_id, cachedict)
+        self.setbykey("incident_handrail", self.camera_id, self.usecase_id, cachedict)
 
 
     def process_steps(self):
@@ -119,8 +119,10 @@ class DedicatedPathway(Template, Caching, IncidentExtract, PostProcessing):
         steps_keys = list(map(lambda x: int(x), list(self.steps.keys())))
         steps_keys.sort()
         # print("========steps keys extracted=====")
+        print(self.steps,steps_keys)
         for ki in steps_keys:
             step = self.steps[str(ki)]
+            print("=====step====",step)
             if step["step_type"] == "model":
                 self.expected_class.extend(list(step["classes"].values()))
                 # print("=======inside model===")
@@ -167,7 +169,7 @@ class DedicatedPathway(Template, Caching, IncidentExtract, PostProcessing):
             cachedict = {}
             cachedict["detections"] = []
             cachedict["detections"].insert(0, currentdata)
-        self.setbykey("ddp", self.camera_id, self.usecase_id, cachedict)
+        self.setbykey("handrail", self.camera_id, self.usecase_id, cachedict)
 
     def process_data(self,logger):
         '''
@@ -192,7 +194,7 @@ class DedicatedPathway(Template, Caching, IncidentExtract, PostProcessing):
 
         detection_data = []
         incident_dict = []
-        cachedict = self.getbykey("ddp", self.camera_id, self.usecase_id)
+        cachedict = self.getbykey("handrail", self.camera_id, self.usecase_id)
         print("=====cachedict====")
         # print(cachedict)
         if cachedict is None or len(cachedict) == 0:
@@ -206,7 +208,9 @@ class DedicatedPathway(Template, Caching, IncidentExtract, PostProcessing):
         if "prediction_class" in filtered_res_dict:
             detection_data = filtered_res_dict["prediction_class"]
             IncidentExtract.__init__(self, filtered_res_dict, self.incidents, self.allsteps)
+            print("=======start incident processing===")
             incident_dict, detection_incidentflag["prediction_class"] = self.process_incident()
+            print("======Processing incident done====")
         
         print("=========incident dict======")
         print(len(incident_dict))
@@ -214,7 +218,8 @@ class DedicatedPathway(Template, Caching, IncidentExtract, PostProcessing):
         print(len(detection_data))
         if len(incident_dict)>0:
             print("====len of incident before filter====",len(incident_dict))
-            cachedict_incident=self.getbykey("incident_pathway", self.camera_id, self.usecase_id)
+            cachedict_incident=self.getbykey("incident_handrail", self.camera_id, self.usecase_id)
+
             incident_dict,current_incidents=self.filter_base_incidents(cachedict_incident,incident_dict)
             
             self.set_cache_incident(cachedict_incident,current_incidents)
