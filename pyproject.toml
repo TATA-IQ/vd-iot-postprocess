@@ -12,7 +12,7 @@ packages = [
 
 [tool.poetry.dependencies]
 python = ">=3.9,<4.0"
-python-consul = "^1.1.0"
+python-consul = "1.1.0"
 opencv-python = "^4.8.1.78"
 fastapi = {extras = ["all"], version = "^0.104.1"}
 paramiko = "^3.3.1"
@@ -28,6 +28,7 @@ glob2 = "^0.7"
 grpcio-tools = "^1.60.0"
 pandas = "^2.1.3"
 scipy = "^1.11.4"
+console-logging = "0.0.5.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.2.0"
