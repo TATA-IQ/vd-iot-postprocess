@@ -48,6 +48,19 @@ def get_local_ip():
         finally:
             s.close()
         return IP
+def check_service_address(consul_client,service_name,env):
+    
+        
+    try:
+        services=consul_client.catalog.service(service_name)[1]
+        console.info(f" Service Extracted from Cosnul For {service_name} : {services}")
+        for i in services:
+            if env == i["ServiceID"].split("-")[-1]:
+                consul_client.agent.service.deregister(i["ServiceID"])
+    except:
+        time.sleep(10)
+        pass
+    return None
 
 def register_service(consul_conf,port):
     local_ip=get_local_ip()
@@ -55,12 +68,15 @@ def register_service(consul_conf,port):
     # local_ip=socket.gethostbyname(socket.gethostname())
     print("====local_ip , name =====",local_ip, name)
     consul_client = consul.Consul(host=consul_conf["host"],port=int(consul_conf["port"]))
+    servicestatus=check_service_address(consul_client,"postprocess",consul_conf["env"])
+    # if servicestatus is None:
     consul_client.agent.service.register(
-    "postprocess",service_id=name+"-postprocess-"+consul_conf["env"],
-    port=int(port),
-    address=local_ip,
-    tags=["python","postprocess",consul_conf["env"]]
-)
+        "postprocess",service_id=name+"-postprocess-"+consul_conf["env"],
+        port=int(port),
+        address=local_ip,
+        tags=["python","postprocess",consul_conf["env"]]
+    )
+    
 
 def get_service_address(consul_client,service_name,env):
     while True:
